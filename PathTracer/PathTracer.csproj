@@ -46,6 +46,8 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Math\Vector3.cs" />
+    <Compile Include="Rendering\Image.cs" />
+    <Compile Include="Rendering\Color.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="Math\TestVector3.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Rendering\TestColor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
