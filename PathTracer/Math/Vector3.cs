@@ -97,5 +97,30 @@
         /// <param name="B">Input vector B</param>
         /// <returns>Cross product between two vectors</returns>
         public static Vector3 Cross(Vector3 A, Vector3 B) => new Vector3((A.Y * B.Z) - (A.Z * B.Y), (A.Z * B.X) - (A.X * B.Z), (A.X * B.Y) - (A.Y * B.X));
+
+        /// <summary>
+        /// Compare this vector against another vector
+        /// </summary>
+        /// <param name="obj">Vector to compare against</param>
+        /// <returns>True when all components have equal values, false otherwise</returns>
+        public override bool Equals(object obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+            {
+                return false;
+            }
+
+            Vector3 vecObj = obj as Vector3;
+            return (X == vecObj.X && Y == vecObj.Y && Z == vecObj.Z);
+        }
+
+        /// <summary>
+        /// Override GetHashCode(), not implemented
+        /// </summary>
+        /// <returns>Hash code</returns>
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
     }
 }

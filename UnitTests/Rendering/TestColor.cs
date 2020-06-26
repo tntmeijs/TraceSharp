@@ -85,5 +85,16 @@ namespace UnitTests.Rendering
 
             Assert.IsTrue(color.R == 0.0d && color.G == 0.0d && color.B == 0.0d, "Color is not black.");
         }
+
+        [TestMethod]
+        public void TestEqualColor()
+        {
+            Color A = Color.Red;
+            Color B = Color.Red;
+            Color C = Color.Blue;
+            
+            Assert.IsTrue(A.Equals(B),  "Color A should be equal to color B.");
+            Assert.IsFalse(A.Equals(C), "Color A should not be equal to color C.");
+        }
     }
 }

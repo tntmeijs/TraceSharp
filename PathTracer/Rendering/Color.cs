@@ -81,5 +81,30 @@ namespace PathTracer.Rendering
         {
             Data = new Vector3(red, green, blue);
         }
+
+        /// <summary>
+        /// Check if two colors are the same
+        /// </summary>
+        /// <param name="obj">Color to check against</param>
+        /// <returns>True when equal colors, false when one of the components is different</returns>
+        public override bool Equals(object obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+            {
+                return false;
+            }
+
+            Color colObj = obj as Color;
+            return Data.Equals(colObj.Data);
+        }
+
+        /// <summary>
+        /// Override GetHashCode(), not implemented
+        /// </summary>
+        /// <returns>Hash code</returns>
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
     }
 }

@@ -52,6 +52,7 @@
     <Compile Include="Math\TestVector3.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rendering\TestColor.cs" />
+    <Compile Include="Rendering\TestImage.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

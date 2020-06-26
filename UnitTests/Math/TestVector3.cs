@@ -113,5 +113,16 @@ namespace UnitTests.Math
 
             Assert.IsTrue(A.Magnitude == 10.0d, "Incorrect vector magnitude.");
         }
+
+        [TestMethod]
+        public void TestEqualVector3()
+        {
+            Vector3 A = new Vector3(6.0f, 7.0d, 8.0d);
+            Vector3 B = new Vector3(6.0d, 7.0d, 8.0d);
+            Vector3 C = Vector3.Zero;
+
+            Assert.IsTrue(A.Equals(B),  "Vector A should be equal to vector B.");
+            Assert.IsFalse(A.Equals(C), "Vector A should not be equal to vector C.");
+        }
     }
 }
