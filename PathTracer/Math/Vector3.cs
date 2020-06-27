@@ -133,6 +133,14 @@
         public static Vector3 operator *(Vector3 lhs, Vector3 rhs) => new Vector3(lhs.X * rhs.X, lhs.Y * rhs.Y, lhs.Z * rhs.Z);
 
         /// <summary>
+        /// Multiplies a vector with a scalar value
+        /// </summary>
+        /// <param name="lhs">Input vector</param>
+        /// <param name="rhs">Input scalar</param>
+        /// <returns>Scaled vector</returns>
+        public static Vector3 operator *(Vector3 lhs, double rhs) => new Vector3(lhs.X * rhs, lhs.Y * rhs, lhs.Z * rhs);
+
+        /// <summary>
         /// Calculate the dot product between two vectors
         /// </summary>
         /// <param name="A">Input vector A</param>

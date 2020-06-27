@@ -87,6 +87,18 @@ namespace UnitTests.Math
         }
 
         [TestMethod]
+        public void TestOperatorMultiplyScalarVector3()
+        {
+            Vector3 lhs = new Vector3(2.0d, 3.0d, 4.0d);
+            double  rhs = 5.0d;
+            Vector3 mtp = lhs * rhs;
+
+            Assert.IsTrue(mtp.X == 10.0d, "Vector X component did not multiply correctly.");
+            Assert.IsTrue(mtp.Y == 15.0d, "Vector Y component did not multiply correctly.");
+            Assert.IsTrue(mtp.Z == 20.0d, "Vector Z component did not multiply correctly.");
+        }
+
+        [TestMethod]
         public void TestDotVector3()
         {
             Vector3 A = new Vector3(1.0f, 3.0f, -5.0f);

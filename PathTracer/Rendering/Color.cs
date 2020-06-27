@@ -80,6 +80,17 @@ namespace PathTracer.Rendering
         }
 
         /// <summary>
+        /// Multiply the color with a scalar
+        /// </summary>
+        /// <param name="lhs">Color to multiply</param>
+        /// <param name="scalar">Scalar</param>
+        /// <returns>Scaled color</returns>
+        public static Color operator *(Color lhs, double scalar)
+        {
+            return new Color(lhs.Data * scalar);
+        }
+
+        /// <summary>
         /// Check if two colors are the same
         /// </summary>
         /// <param name="obj">Color to check against</param>

@@ -96,5 +96,17 @@ namespace UnitTests.Rendering
             Assert.IsTrue(A.Equals(B),  "Color A should be equal to color B.");
             Assert.IsFalse(A.Equals(C), "Color A should not be equal to color C.");
         }
+
+        [TestMethod]
+        public void TestOperatorMultiplyScalarColor()
+        {
+            Color lhs = new Color(2.0d, 3.0d, 4.0d);
+            double rhs = 5.0d;
+            Color mtp = lhs * rhs;
+
+            Assert.IsTrue(mtp.R == 10.0d, "Vector X component did not multiply correctly.");
+            Assert.IsTrue(mtp.G == 15.0d, "Vector Y component did not multiply correctly.");
+            Assert.IsTrue(mtp.B == 20.0d, "Vector Z component did not multiply correctly.");
+        }
     }
 }
