@@ -71,6 +71,10 @@ namespace PathTracer
                     u = (u * 2.0d) - 1.0d;
                     v = (v * 2.0d) - 1.0d;
 
+                    // Correct for the aspect ratio
+                    double aspectRatio = (double)OUTPUT_WIDTH / OUTPUT_HEIGHT;
+                    v /= aspectRatio;
+
                     // Ray starts at the camera origin and goes through the imaginary pixel rectangle
                     Ray cameraRay = new Ray(Vector3.Zero, new Vector3(u, v, 1.0d));
 
