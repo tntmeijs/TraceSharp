@@ -37,8 +37,7 @@ namespace UnitTests.Primitives
             // Test if the ray hits the sphere when the ray starts inside the sphere
             bool hit = sphere.TestRayIntersection(ray, 0.1d, 10000.0d, ref hitInfo);
 
-            Assert.IsFalse(hit,                                 "Ray starts inside the sphere, this should not be a hit.");
-            Assert.IsTrue(hitInfo.Distance == sphere.Radius,    "Hit distance should equal the sphere's radius.");
+            Assert.IsFalse(hit, "Ray starts inside the sphere, this should not be a hit.");
         }
 
         [TestMethod]
