@@ -28,11 +28,15 @@ namespace PathTracer
                     double u = (double)uInt / OUTPUT_WIDTH;
                     double v = (double)vInt / OUTPUT_HEIGHT;
 
-                    // Invert the vertical range to move [0, 0] to the bottom-left corner of the image
+                    // Invert the vertical range to flip the image to the correct orientation
                     v = 1.0d - v;
 
+                    // Transform from 0 - 1 to -1 - 1
+                    u = (u * 2.0d) - 1.0d;
+                    v = (v * 2.0d) - 1.0d;
+
                     // Simply use the UV coordinates as the pixel colors
-                    Color outputColor = new Color(u, v, 0.0d);
+                    Color outputColor = new Color(System.Math.Abs(u), System.Math.Abs(v), 0.0d);
                     outputImage.SetPixel(pixelIndex++, outputColor);
                 }
             }
