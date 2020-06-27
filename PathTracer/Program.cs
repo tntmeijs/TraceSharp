@@ -12,9 +12,10 @@ namespace PathTracer
             // Final pixel color
             Color color = Color.Black;
 
-            Material purple = new Material(Color.Purple,    Color.Black);
-            Material red    = new Material(Color.Red,       Color.Black);
-            Material blue   = new Material(Color.Blue,      Color.Black);
+            Material purple = new Material(Color.Purple,                Color.Black);
+            Material red    = new Material(Color.Red,                   Color.Black);
+            Material blue   = new Material(Color.Blue,                  Color.Black);
+            Material gray   = new Material(new Color(0.6d, 0.6d, 0.6d), Color.Black);
 
             PrimitiveHitInfo hitInfo = new PrimitiveHitInfo();
             hitInfo.Distance = maxLength;
@@ -22,6 +23,18 @@ namespace PathTracer
             SpherePrimitive sphereA = new SpherePrimitive(new Vector3(-10.0d, 0.0d, 20.0d), 1.0d, purple);
             SpherePrimitive sphereB = new SpherePrimitive(new Vector3(  0.0d, 0.0d, 20.0d), 1.0d, red);
             SpherePrimitive sphereC = new SpherePrimitive(new Vector3( 10.0d, 0.0d, 20.0d), 1.0d, blue);
+
+            QuadPrimitive quadA = new QuadPrimitive(
+                new Vector3(-15.0d, -15.0d, 22.0d),
+                new Vector3( 15.0d, -15.0d, 22.0d),
+                new Vector3( 15.0d,  15.0d, 22.0d),
+                new Vector3(-15.0d,  15.0d, 22.0d),
+                gray);
+
+            if (quadA.TestRayIntersection(ray, minLength, maxLength, ref hitInfo))
+            {
+                color = quadA.Material.Albedo;
+            }
 
             if (sphereA.TestRayIntersection(ray, minLength, maxLength, ref hitInfo))
             {

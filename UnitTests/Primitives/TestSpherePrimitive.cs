@@ -41,20 +41,6 @@ namespace UnitTests.Primitives
         }
 
         [TestMethod]
-        public void TestRayIntersectInFrontSpherePrimitive()
-        {
-            SpherePrimitive sphere = new SpherePrimitive(new Material(Color.Black, Color.Black));
-            PrimitiveHitInfo hitInfo = new PrimitiveHitInfo();
-            Ray ray = new Ray(new Vector3(0.0d, 0.0d, -5.0d), Vector3.Forward);
-
-            // Test if the ray hits the sphere when the ray stars in behind of the sphere
-            bool hit = sphere.TestRayIntersection(ray, 0.1d, 10000.0d, ref hitInfo);
-
-            Assert.IsTrue(hit,                      "Ray starts in front of the sphere, this should be a hit.");
-            Assert.IsTrue(hitInfo.Distance == 4.0d, "Hit distance incorrect.");
-        }
-
-        [TestMethod]
         public void TestRayIntersectBehindSpherePrimitive()
         {
             SpherePrimitive sphere = new SpherePrimitive(new Material(Color.Black, Color.Black));

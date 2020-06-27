@@ -47,6 +47,7 @@
     <Compile Include="Primitives\PrimitiveBase.cs" />
     <Compile Include="Primitives\PrimitiveHitInfo.cs" />
     <Compile Include="Primitives\IPrimitiveIntersection.cs" />
+    <Compile Include="Primitives\QuadPrimitive.cs" />
     <Compile Include="Primitives\SpherePrimitive.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
