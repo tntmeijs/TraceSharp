@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Math\Ray.cs" />
+    <Compile Include="Primitives\PrimitiveBase.cs" />
     <Compile Include="Primitives\PrimitiveHitInfo.cs" />
     <Compile Include="Primitives\IPrimitiveIntersection.cs" />
     <Compile Include="Primitives\SpherePrimitive.cs" />
@@ -52,6 +53,7 @@
     <Compile Include="Math\Vector3.cs" />
     <Compile Include="Rendering\Image.cs" />
     <Compile Include="Rendering\Color.cs" />
+    <Compile Include="Rendering\Material.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

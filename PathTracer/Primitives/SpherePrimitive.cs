@@ -1,26 +1,28 @@
 ﻿using PathTracer.Math;
+using PathTracer.Rendering;
 
 namespace PathTracer.Primitives
 {
     /// <summary>
     /// Reference: https://viclw17.github.io/2018/07/16/raytracing-ray-sphere-intersection/
     /// </summary>
-    class SpherePrimitive : IPrimitiveIntersection
+    class SpherePrimitive : PrimitiveBase
     {
         /// <summary>
         /// Center of the sphere in 3D space
         /// </summary>
-        public Vector3 Center { get; set; }
+        public Vector3 Center;
 
         /// <summary>
         /// Radius of the sphere
         /// </summary>
-        public double Radius { get; set; }
+        public double Radius;
 
         /// <summary>
         /// Create a new sphere primitive at (0, 0, 0) with a radius of 1
         /// </summary>
-        public SpherePrimitive()
+        /// <param name="material">Material to render this sphere with</param>
+        public SpherePrimitive(Material material) : base(material)
         {
             Center = Vector3.Zero;
             Radius = 1.0d;
@@ -31,7 +33,8 @@ namespace PathTracer.Primitives
         /// </summary>
         /// <param name="center">Origin to place the sphere at</param>
         /// <param name="radius">Radius of the sphere</param>
-        public SpherePrimitive(Vector3 center, double radius)
+        /// <param name="material">Material to render this sphere with</param>
+        public SpherePrimitive(Vector3 center, double radius, Material material) : base(material)
         {
             Center = center;
             Radius = radius;
@@ -45,7 +48,7 @@ namespace PathTracer.Primitives
         /// <param name="maxHitDistance">Maximum distance from the ray's origin before a miss is considered</param>
         /// <param name="hitInfo">Hit information</param>
         /// <returns>True when the ray intersects the sphere, false otherwise</returns>
-        public bool TestRayIntersection(Ray ray, double minHitDistance, double maxHitDistance, out PrimitiveHitInfo hitInfo)
+        public override bool TestRayIntersection(Ray ray, double minHitDistance, double maxHitDistance, out PrimitiveHitInfo hitInfo)
         {
             hitInfo = new PrimitiveHitInfo();
 

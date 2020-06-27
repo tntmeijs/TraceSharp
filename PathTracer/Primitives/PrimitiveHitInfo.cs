@@ -7,12 +7,12 @@ namespace PathTracer.Primitives
         /// <summary>
         /// Distance to the hit
         /// </summary>
-        public double Distance { get; set; }
+        public double Distance;
 
         /// <summary>
         /// Surface normal
         /// </summary>
-        public Vector3 Normal { get; set; }
+        public Vector3 Normal;
 
         /// <summary>
         /// Create new intersection information that defaults to no intersection at all

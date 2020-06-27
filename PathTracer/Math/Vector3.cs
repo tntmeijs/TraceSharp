@@ -5,17 +5,17 @@
         /// <summary>
         /// X component of the vector
         /// </summary>
-        public double X { get; set; }
+        public double X;
 
         /// <summary>
         /// Y component of the vector
         /// </summary>
-        public double Y { get; set; }
+        public double Y;
 
         /// <summary>
         /// Z component of the vector
         /// </summary>
-        public double Z { get; set; }
+        public double Z;
 
         /// <summary>
         /// Create a forward-facing vector
