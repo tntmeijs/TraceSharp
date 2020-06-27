@@ -44,6 +44,9 @@ namespace PathTracer
             // Maximum length of a ray before it is considered a miss
             const double MAXIMUM_RAY_LENGTH = 10000.0d;
 
+            // Camera field of view in degrees
+            const double CAMERA_FOV = 90.0d;
+
             // The path tracer will create images with a resolution of 1280x720
             const int OUTPUT_WIDTH  = 1280;
             const int OUTPUT_HEIGHT = 720;
@@ -75,8 +78,11 @@ namespace PathTracer
                     double aspectRatio = (double)OUTPUT_WIDTH / OUTPUT_HEIGHT;
                     v /= aspectRatio;
 
+                    // FOV to camera distance
+                    double cameraDistance = 1.0d / System.Math.Tan(CAMERA_FOV * 0.5d * System.Math.PI / 180.0d);
+
                     // Ray starts at the camera origin and goes through the imaginary pixel rectangle
-                    Ray cameraRay = new Ray(Vector3.Zero, new Vector3(u, v, 1.0d));
+                    Ray cameraRay = new Ray(Vector3.Zero, new Vector3(u, v, cameraDistance));
 
                     // Trace the scene for this pixel
                     Color outputColor = CalculatePixelColor(cameraRay, MINIMUM_RAY_LENGTH, MAXIMUM_RAY_LENGTH);
