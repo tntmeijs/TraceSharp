@@ -1,5 +1,5 @@
 ﻿using System;
-
+using PathTracer.Math;
 using PathTracer.Rendering;
 
 namespace PathTracer
@@ -35,8 +35,11 @@ namespace PathTracer
                     u = (u * 2.0d) - 1.0d;
                     v = (v * 2.0d) - 1.0d;
 
+                    // Ray starts at the camera origin and goes through the imaginary pixel rectangle
+                    Ray cameraRay = new Ray(Vector3.Zero, new Vector3(u, v, 1.0d));
+
                     // Simply use the UV coordinates as the pixel colors
-                    Color outputColor = new Color(System.Math.Abs(u), System.Math.Abs(v), 0.0d);
+                    Color outputColor = new Color(cameraRay.Direction);
                     outputImage.SetPixel(pixelIndex++, outputColor);
                 }
             }
