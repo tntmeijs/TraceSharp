@@ -29,6 +29,18 @@
         public double Magnitude => System.Math.Sqrt((X * X) + (Y * Y) + (Z * Z));
 
         /// <summary>
+        /// Compute a normalized version of this vector
+        /// </summary>
+        public Vector3 Normalized
+        {
+            get
+            {
+                double magnitude = Magnitude;
+                return new Vector3(X / magnitude, Y / magnitude, Z / magnitude);
+            }
+        }
+
+        /// <summary>
         /// Create a new Vector3 with all components set to a specified value
         /// </summary>
         /// <param name="x">X component of the vector</param>
@@ -39,6 +51,17 @@
             X = x;
             Y = y;
             Z = z;
+        }
+
+        /// <summary>
+        /// Normalize this vector
+        /// </summary>
+        public void Normalize()
+        {
+            double magnitude = Magnitude;
+            X /= magnitude;
+            Y /= magnitude;
+            Z /= magnitude;
         }
 
         /// <summary>

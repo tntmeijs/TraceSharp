@@ -124,5 +124,20 @@ namespace UnitTests.Math
             Assert.IsTrue(A.Equals(B),  "Vector A should be equal to vector B.");
             Assert.IsFalse(A.Equals(C), "Vector A should not be equal to vector C.");
         }
+
+        [TestMethod]
+        public void TestNormalizeVector3()
+        {
+            Vector3 A = new Vector3(4.0d, 5.0d, 6.0d);
+            Vector3 B = A.Normalized;
+            A.Normalize();
+
+            // Since normalizing a double will almost never result in a perfect value of 1.0
+            // It suffices to be very close to 1.0 instead
+            const double EPSILON = 0.0001d;
+
+            Assert.IsTrue((1.0d - A.Magnitude) <= EPSILON, "Vector A is not a unit vector.");
+            Assert.IsTrue((1.0d - B.Magnitude) <= EPSILON, "Vector B is not a unit vector.");
+        }
     }
 }
