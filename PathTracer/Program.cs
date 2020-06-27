@@ -8,6 +8,13 @@ namespace PathTracer
     {
         static void Main(string[] args)
         {
+            // Minimum distance a ray must travel before an intersection is considered
+            // This prevents the ray from intersecting a surface it just bounced from
+            const double MINIMUM_RAY_LENGTH = 0.1d;
+
+            // Maximum length of a ray before it is considered a miss
+            const double MAXIMUM_RAY_LENGTH = 10000.0d;
+
             // The path tracer will create images with a resolution of 1280x720
             const int OUTPUT_WIDTH  = 1280;
             const int OUTPUT_HEIGHT = 720;
