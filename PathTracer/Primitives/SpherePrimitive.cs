@@ -41,11 +41,17 @@ namespace PathTracer.Primitives
         /// Determine whether the ray intersects with the sphere
         /// </summary>
         /// <param name="ray">Ray to test against</param>
+        /// <param name="minHitDistance">Minimum distance from the ray's origin before a hit is considered</param>
+        /// <param name="maxHitDistance">Maximum distance from the ray's origin before a miss is considered</param>
         /// <param name="hitInfo">Hit information</param>
         /// <returns>True when the ray intersects the sphere, false otherwise</returns>
-        public bool TestRayIntersection(Ray ray, out PrimitiveHitInfo hitInfo)
+        public bool TestRayIntersection(Ray ray, double minHitDistance, double maxHitDistance, out PrimitiveHitInfo hitInfo)
         {
             hitInfo = new PrimitiveHitInfo();
+
+            // Account for the sphere's radius
+            minHitDistance += Radius;
+            maxHitDistance += Radius;
 
             // Quadratic formula, hence the names a, b, c, d
             Vector3 originCenter = ray.Origin - Center;
@@ -61,6 +67,14 @@ namespace PathTracer.Primitives
                 if (numerator > 0.0d)
                 {
                     hitInfo.Distance = numerator / (2.0d * a);
+
+                    // Too close / too far
+                    if (hitInfo.Distance < minHitDistance || hitInfo.Distance > maxHitDistance)
+                    {
+                        return false;
+                    }
+
+                    // Hit
                     return true;
                 }
 
@@ -69,6 +83,14 @@ namespace PathTracer.Primitives
                 if (numerator > 0.0d)
                 {
                     hitInfo.Distance = numerator / (2.0d * a);
+
+                    // Too close / too far
+                    if (hitInfo.Distance < minHitDistance || hitInfo.Distance > maxHitDistance)
+                    {
+                        return false;
+                    }
+
+                    // Hit
                     return true;
                 }
             }

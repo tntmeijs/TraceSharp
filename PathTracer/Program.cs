@@ -17,17 +17,17 @@ namespace PathTracer
             SpherePrimitive sphereB = new SpherePrimitive(new Vector3(  0.0d, 0.0d, 20.0d), 1.0d);
             SpherePrimitive sphereC = new SpherePrimitive(new Vector3( 10.0d, 0.0d, 20.0d), 1.0d);
 
-            if (sphereA.TestRayIntersection(ray, out hitInfo))
+            if (sphereA.TestRayIntersection(ray, minLength, maxLength, out hitInfo))
             {
                 color = Color.Purple;
             }
 
-            if (sphereB.TestRayIntersection(ray, out hitInfo))
+            if (sphereB.TestRayIntersection(ray, minLength, maxLength, out hitInfo))
             {
                 color = Color.Red;
             }
 
-            if (sphereC.TestRayIntersection(ray, out hitInfo))
+            if (sphereC.TestRayIntersection(ray, minLength, maxLength, out hitInfo))
             {
                 color = Color.Blue;
             }
