@@ -1,8 +1,5 @@
 ﻿namespace PathTracer.Math
 {
-    /// <summary>
-    /// Basic three-dimensional vector arithmetic
-    /// </summary>
     class Vector3
     {
         /// <summary>

@@ -2,9 +2,6 @@
 
 namespace PathTracer.Rendering
 {
-    /// <summary>
-    /// Represents color data
-    /// </summary>
     class Color
     {
         private readonly Vector3 Data;
