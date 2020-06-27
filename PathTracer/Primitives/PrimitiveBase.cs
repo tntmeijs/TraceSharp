@@ -28,6 +28,6 @@ namespace PathTracer.Primitives
         /// <param name="maxHitDistance">Maximum distance a ray can travel until it is considered a miss</param>
         /// <param name="hitInfo">Surface hit information</param>
         /// <returns>True when a primitive has been hit, false otherwise</returns>
-        public abstract bool TestRayIntersection(Ray ray, double minHitDistance, double maxHitDistance, out PrimitiveHitInfo hitInfo);
+        public abstract bool TestRayIntersection(Ray ray, double minHitDistance, double maxHitDistance, ref PrimitiveHitInfo hitInfo);
     }
 }

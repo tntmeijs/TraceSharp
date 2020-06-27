@@ -16,22 +16,24 @@ namespace PathTracer
             Material red    = new Material(Color.Red,       Color.Black);
             Material blue   = new Material(Color.Blue,      Color.Black);
 
-            PrimitiveHitInfo hitInfo;
+            PrimitiveHitInfo hitInfo = new PrimitiveHitInfo();
+            hitInfo.Distance = maxLength;
+
             SpherePrimitive sphereA = new SpherePrimitive(new Vector3(-10.0d, 0.0d, 20.0d), 1.0d, purple);
             SpherePrimitive sphereB = new SpherePrimitive(new Vector3(  0.0d, 0.0d, 20.0d), 1.0d, red);
             SpherePrimitive sphereC = new SpherePrimitive(new Vector3( 10.0d, 0.0d, 20.0d), 1.0d, blue);
 
-            if (sphereA.TestRayIntersection(ray, minLength, maxLength, out hitInfo))
+            if (sphereA.TestRayIntersection(ray, minLength, maxLength, ref hitInfo))
             {
                 color = sphereA.Material.Albedo;
             }
 
-            if (sphereB.TestRayIntersection(ray, minLength, maxLength, out hitInfo))
+            if (sphereB.TestRayIntersection(ray, minLength, maxLength, ref hitInfo))
             {
                 color = sphereB.Material.Albedo;
             }
 
-            if (sphereC.TestRayIntersection(ray, minLength, maxLength, out hitInfo))
+            if (sphereC.TestRayIntersection(ray, minLength, maxLength, ref hitInfo))
             {
                 color = sphereC.Material.Albedo;
             }

@@ -3,9 +3,6 @@ using PathTracer.Rendering;
 
 namespace PathTracer.Primitives
 {
-    /// <summary>
-    /// Reference: https://viclw17.github.io/2018/07/16/raytracing-ray-sphere-intersection/
-    /// </summary>
     class SpherePrimitive : PrimitiveBase
     {
         /// <summary>
@@ -42,63 +39,52 @@ namespace PathTracer.Primitives
 
         /// <summary>
         /// Determine whether the ray intersects with the sphere
+        /// Reference: Shadertoy by Alan Wolfe
         /// </summary>
         /// <param name="ray">Ray to test against</param>
         /// <param name="minHitDistance">Minimum distance from the ray's origin before a hit is considered</param>
         /// <param name="maxHitDistance">Maximum distance from the ray's origin before a miss is considered</param>
         /// <param name="hitInfo">Hit information</param>
         /// <returns>True when the ray intersects the sphere, false otherwise</returns>
-        public override bool TestRayIntersection(Ray ray, double minHitDistance, double maxHitDistance, out PrimitiveHitInfo hitInfo)
+        public override bool TestRayIntersection(Ray ray, double minHitDistance, double maxHitDistance, ref PrimitiveHitInfo hitInfo)
         {
-            hitInfo = new PrimitiveHitInfo();
+            // Vector from center of the sphere to where the ray begins
+            Vector3 m = ray.Origin - Center;
 
-            // Account for the sphere's radius
-            minHitDistance += Radius;
-            maxHitDistance += Radius;
+            double b = Vector3.Dot(m, ray.Direction);
+            double c = Vector3.Dot(m, m) - (Radius * Radius);
 
-            // Quadratic formula, hence the names a, b, c, d
-            Vector3 originCenter = ray.Origin - Center;
-            double a = Vector3.Dot(ray.Direction, ray.Direction);
-            double b = 2.0d * Vector3.Dot(originCenter, ray.Direction);
-            double c = Vector3.Dot(originCenter, originCenter) - Radius * Radius;
-            double d = (b * b) - (4.0d * a * c);
-
-            if (d >= 0.0d)
+            if (c > 0.0d && b > 0.0d)
             {
-                // Negative test of the quadratic formula
-                double numerator = -b - System.Math.Sqrt(d);
-                if (numerator > 0.0d)
-                {
-                    hitInfo.Distance = numerator / (2.0d * a);
-
-                    // Too close / too far
-                    if (hitInfo.Distance < minHitDistance || hitInfo.Distance > maxHitDistance)
-                    {
-                        return false;
-                    }
-
-                    // Hit
-                    return true;
-                }
-
-                // Positive test of the quadratic formula
-                numerator = -b + System.Math.Sqrt(d);
-                if (numerator > 0.0d)
-                {
-                    hitInfo.Distance = numerator / (2.0d * a);
-
-                    // Too close / too far
-                    if (hitInfo.Distance < minHitDistance || hitInfo.Distance > maxHitDistance)
-                    {
-                        return false;
-                    }
-
-                    // Hit
-                    return true;
-                }
+                return false;
             }
 
-            // No intersections
+            // Discriminant (quadratic formula)
+            double d = (b * b) - c;
+
+            // Ray misses the sphere
+            if (d < 0.0d)
+            {
+                return false;
+            }
+
+            // Compute smallest value of intersection
+            bool inside = false;
+            double distance = -b - System.Math.Sqrt(d);
+            
+            if (distance < 0.0d)
+            {
+                inside = true;
+                distance = -b + System.Math.Sqrt(d);
+            }
+
+            if (distance > minHitDistance && distance < hitInfo.Distance)
+            {
+                hitInfo.Distance = distance;
+                hitInfo.Normal = (ray.Origin + (ray.Direction * distance) - Center) * (inside ? -1.0d : 1.0d);
+                return true;
+            }
+
             return false;
         }
     }
