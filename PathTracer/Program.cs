@@ -1,11 +1,40 @@
 ﻿using System;
 using PathTracer.Math;
+using PathTracer.Primitives;
 using PathTracer.Rendering;
 
 namespace PathTracer
 {
     class Program
     {
+        static Color CalculatePixelColor(Ray ray, double minLength, double maxLength)
+        {
+            // Final pixel color
+            Color color = Color.Black;
+
+            PrimitiveHitInfo hitInfo;
+            SpherePrimitive sphereA = new SpherePrimitive(new Vector3(-10.0d, 0.0d, 20.0d), 1.0d);
+            SpherePrimitive sphereB = new SpherePrimitive(new Vector3(  0.0d, 0.0d, 20.0d), 1.0d);
+            SpherePrimitive sphereC = new SpherePrimitive(new Vector3( 10.0d, 0.0d, 20.0d), 1.0d);
+
+            if (sphereA.TestRayIntersection(ray, out hitInfo))
+            {
+                color = Color.Purple;
+            }
+
+            if (sphereB.TestRayIntersection(ray, out hitInfo))
+            {
+                color = Color.Red;
+            }
+
+            if (sphereC.TestRayIntersection(ray, out hitInfo))
+            {
+                color = Color.Blue;
+            }
+
+            return color;
+        }
+
         static void Main(string[] args)
         {
             // Minimum distance a ray must travel before an intersection is considered
@@ -45,8 +74,8 @@ namespace PathTracer
                     // Ray starts at the camera origin and goes through the imaginary pixel rectangle
                     Ray cameraRay = new Ray(Vector3.Zero, new Vector3(u, v, 1.0d));
 
-                    // Simply use the UV coordinates as the pixel colors
-                    Color outputColor = new Color(cameraRay.Direction);
+                    // Trace the scene for this pixel
+                    Color outputColor = CalculatePixelColor(cameraRay, MINIMUM_RAY_LENGTH, MAXIMUM_RAY_LENGTH);
                     outputImage.SetPixel(pixelIndex++, outputColor);
                 }
             }

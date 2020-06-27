@@ -18,6 +18,36 @@
         public double Z { get; set; }
 
         /// <summary>
+        /// Create a forward-facing vector
+        /// </summary>
+        public static Vector3 Forward => new Vector3(0.0d, 0.0d, 1.0d);
+
+        /// <summary>
+        /// Create a backward-facing vector
+        /// </summary>
+        public static Vector3 Backward => -Forward;
+
+        /// <summary>
+        /// Create an upward-facing vector
+        /// </summary>
+        public static Vector3 Up => new Vector3(0.0d, 1.0d, 0.0d);
+
+        /// <summary>
+        /// Create a downward-facing vector
+        /// </summary>
+        public static Vector3 Down => -Up;
+
+        /// <summary>
+        /// Create a left-facing vector
+        /// </summary>
+        public static Vector3 Left => new Vector3(-1.0d, 0.0d, 0.0d);
+
+        /// <summary>
+        /// Create a right-facing vector
+        /// </summary>
+        public static Vector3 Right => -Left;
+
+        /// <summary>
         /// Create a new Vector3 with all components set to zero
         /// </summary>
         public static Vector3 Zero => new Vector3(0.0d, 0.0d, 0.0d);

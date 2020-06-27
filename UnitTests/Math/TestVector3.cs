@@ -139,5 +139,47 @@ namespace UnitTests.Math
             Assert.IsTrue((1.0d - A.Magnitude) <= EPSILON, "Vector A is not a unit vector.");
             Assert.IsTrue((1.0d - B.Magnitude) <= EPSILON, "Vector B is not a unit vector.");
         }
+
+        [TestMethod]
+        public void TestForwardVector3()
+        {
+            Vector3 A = Vector3.Forward;
+            Assert.IsTrue(A.Equals(new Vector3(0.0d, 0.0d, 1.0d)), "Vector does not point forward.");
+        }
+
+        [TestMethod]
+        public void TestBackwardVector3()
+        {
+            Vector3 A = Vector3.Backward;
+            Assert.IsTrue(A.Equals(new Vector3(0.0d, 0.0d, -1.0d)), "Vector does not point backward.");
+        }
+
+        [TestMethod]
+        public void TestUpVector3()
+        {
+            Vector3 A = Vector3.Up;
+            Assert.IsTrue(A.Equals(new Vector3(0.0d, 1.0d, 0.0d)), "Vector does not point up.");
+        }
+
+        [TestMethod]
+        public void TestDownVector3()
+        {
+            Vector3 A = Vector3.Down;
+            Assert.IsTrue(A.Equals(new Vector3(0.0d, -1.0d, 0.0d)), "Vector does not point down.");
+        }
+
+        [TestMethod]
+        public void TestLeftVector3()
+        {
+            Vector3 A = Vector3.Left;
+            Assert.IsTrue(A.Equals(new Vector3(-1.0d, 0.0d, 0.0d)), "Vector does not point left.");
+        }
+
+        [TestMethod]
+        public void TestRightVector3()
+        {
+            Vector3 A = Vector3.Right;
+            Assert.IsTrue(A.Equals(new Vector3(1.0d, 0.0d, 0.0d)), "Vector does not point right.");
+        }
     }
 }
