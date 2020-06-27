@@ -31,11 +31,11 @@ namespace UnitTests.Primitives
         public void TestRayIntersectInsideSpherePrimitive()
         {
             SpherePrimitive sphere = new SpherePrimitive(new Material(Color.Black, Color.Black));
-            PrimitiveHitInfo hitInfo;
+            PrimitiveHitInfo hitInfo = new PrimitiveHitInfo();
             Ray ray = new Ray();
 
             // Test if the ray hits the sphere when the ray starts inside the sphere
-            bool hit = sphere.TestRayIntersection(ray, 0.1d, 10000.0d, out hitInfo);
+            bool hit = sphere.TestRayIntersection(ray, 0.1d, 10000.0d, ref hitInfo);
 
             Assert.IsFalse(hit,                                 "Ray starts inside the sphere, this should not be a hit.");
             Assert.IsTrue(hitInfo.Distance == sphere.Radius,    "Hit distance should equal the sphere's radius.");
@@ -45,11 +45,11 @@ namespace UnitTests.Primitives
         public void TestRayIntersectInFrontSpherePrimitive()
         {
             SpherePrimitive sphere = new SpherePrimitive(new Material(Color.Black, Color.Black));
-            PrimitiveHitInfo hitInfo;
+            PrimitiveHitInfo hitInfo = new PrimitiveHitInfo();
             Ray ray = new Ray(new Vector3(0.0d, 0.0d, -5.0d), Vector3.Forward);
 
             // Test if the ray hits the sphere when the ray stars in behind of the sphere
-            bool hit = sphere.TestRayIntersection(ray, 0.1d, 10000.0d, out hitInfo);
+            bool hit = sphere.TestRayIntersection(ray, 0.1d, 10000.0d, ref hitInfo);
 
             Assert.IsTrue(hit,                      "Ray starts in front of the sphere, this should be a hit.");
             Assert.IsTrue(hitInfo.Distance == 4.0d, "Hit distance incorrect.");
@@ -59,11 +59,11 @@ namespace UnitTests.Primitives
         public void TestRayIntersectBehindSpherePrimitive()
         {
             SpherePrimitive sphere = new SpherePrimitive(new Material(Color.Black, Color.Black));
-            PrimitiveHitInfo hitInfo;
+            PrimitiveHitInfo hitInfo = new PrimitiveHitInfo();
             Ray ray = new Ray(new Vector3(0.0d, 0.0d, 5.0d), Vector3.Forward);
 
             // Test if the ray hits the sphere when the ray stars in behind of the sphere
-            bool hit = sphere.TestRayIntersection(ray, 0.1d, 10000.0d, out hitInfo);
+            bool hit = sphere.TestRayIntersection(ray, 0.1d, 10000.0d, ref hitInfo);
 
             Assert.IsFalse(hit, "Ray starts in behind of the sphere, this should never be a hit.");
         }
@@ -75,15 +75,15 @@ namespace UnitTests.Primitives
             const double FAR    = 10000.0d;
 
             SpherePrimitive sphere = new SpherePrimitive(new Material(Color.Black, Color.Black));
-            PrimitiveHitInfo hitInfo;
+            PrimitiveHitInfo hitInfo = new PrimitiveHitInfo();
 
-            // Far out of bounds (miss)
+            // Far ref of bounds (miss)
             Ray ray = new Ray(new Vector3(0.0d, 0.0d, -15000.0d), Vector3.Forward);
-            bool farHit = sphere.TestRayIntersection(ray, NEAR, FAR, out hitInfo);
+            bool farHit = sphere.TestRayIntersection(ray, NEAR, FAR, ref hitInfo);
 
-            // Near out of bounds (too close)
+            // Near ref of bounds (too close)
             ray = new Ray(new Vector3(0.0d, 0.0d, -0.05d), Vector3.Forward);
-            bool nearHit = sphere.TestRayIntersection(ray, NEAR, FAR, out hitInfo);
+            bool nearHit = sphere.TestRayIntersection(ray, NEAR, FAR, ref hitInfo);
 
             Assert.IsFalse(farHit,  "Ray length too long, this should miss the sphere.");
             Assert.IsFalse(nearHit, "Ray length too short, this should miss the sphere.");
