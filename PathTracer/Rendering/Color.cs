@@ -149,21 +149,6 @@ namespace PathTracer.Rendering
         }
 
         /// <summary>
-        /// Convert linear color space to SRGB color space
-        /// Reference: https://stackoverflow.com/a/34480536/11220609
-        /// </summary>
-        /// <param name="color">Linear color</param>
-        /// <returns>SRGB color</returns>
-        public static Color LinearToSRGB(Color color)
-        {
-            double red      = (color.R > 0.0031308d) ? 1.055d * (System.Math.Pow(color.R, (1.0d / 2.4d))) - 0.055d : 12.92d * color.R;
-            double green    = (color.R > 0.0031308d) ? 1.055d * (System.Math.Pow(color.G, (1.0d / 2.4d))) - 0.055d : 12.92d * color.G;
-            double blue     = (color.R > 0.0031308d) ? 1.055d * (System.Math.Pow(color.B, (1.0d / 2.4d))) - 0.055d : 12.92d * color.B;
-
-            return new Color(red, green, blue);
-        }
-
-        /// <summary>
         /// Check if two colors are the same
         /// </summary>
         /// <param name="obj">Color to check against</param>
