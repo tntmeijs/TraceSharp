@@ -81,7 +81,7 @@ namespace PathTracer.Primitives
             if (distance > minHitDistance && distance < hitInfo.Distance)
             {
                 hitInfo.Distance = distance;
-                hitInfo.Normal = (ray.Origin + (ray.Direction * distance) - Center) * (inside ? -1.0d : 1.0d);
+                hitInfo.Normal = ((ray.Origin + (ray.Direction * distance)) - Center).Normalized * (inside ? -1.0d : 1.0d);
                 return true;
             }
 

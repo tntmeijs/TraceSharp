@@ -1,4 +1,5 @@
 ﻿using PathTracer.Math;
+using PathTracer.Rendering;
 
 namespace PathTracer.Primitives
 {
@@ -13,6 +14,16 @@ namespace PathTracer.Primitives
         /// Surface normal
         /// </summary>
         public Vector3 Normal;
+
+        /// <summary>
+        /// Surface color
+        /// </summary>
+        public Color Albedo;
+
+        /// <summary>
+        /// Surface emissiveness
+        /// </summary>
+        public Color Emissive;
 
         /// <summary>
         /// Create new intersection information that defaults to no intersection at all

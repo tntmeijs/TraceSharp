@@ -157,6 +157,18 @@
         public static Vector3 Cross(Vector3 A, Vector3 B) => new Vector3((A.Y * B.Z) - (A.Z * B.Y), (A.Z * B.X) - (A.X * B.Z), (A.X * B.Y) - (A.Y * B.X));
 
         /// <summary>
+        /// Linearly interpolate between two vectors
+        /// </summary>
+        /// <param name="A">Vector A</param>
+        /// <param name="B">Vector B</param>
+        /// <param name="t">Interpolation factor</param>
+        /// <returns>Interpolated vector</returns>
+        public static Vector3 Lerp(Vector3 A, Vector3 B, double t)
+        {
+            return A * (1 - t) + B * t;
+        }
+
+        /// <summary>
         /// Compare this vector against another vector
         /// </summary>
         /// <param name="obj">Vector to compare against</param>

@@ -117,9 +117,9 @@ namespace PathTracer.Rendering
                     {
                         // Convert color from normalized range to 0 - 255
                         Color color = Data[i];
-                        byte red     = (byte)System.Math.Max(System.Math.Floor(color.R * 255.0d), 0);
-                        byte green   = (byte)System.Math.Max(System.Math.Floor(color.G * 255.0d), 0);
-                        byte blue    = (byte)System.Math.Max(System.Math.Floor(color.B * 255.0d), 0);
+                        byte red     = (byte)System.Math.Min(System.Math.Max(System.Math.Floor(color.R * 255.0d), 0.0d), 255.0d);
+                        byte green   = (byte)System.Math.Min(System.Math.Max(System.Math.Floor(color.G * 255.0d), 0.0d), 255.0d);
+                        byte blue    = (byte)System.Math.Min(System.Math.Max(System.Math.Floor(color.B * 255.0d), 0.0d), 255.0d);
 
                         // Convert RGB triplets to a string representation
                         string line = red + " " + green + " " + blue;

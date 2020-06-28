@@ -193,5 +193,24 @@ namespace UnitTests.Math
             Vector3 A = Vector3.Right;
             Assert.IsTrue(A.Equals(new Vector3(1.0d, 0.0d, 0.0d)), "Vector does not point right.");
         }
+
+        [TestMethod]
+        public void TestLerpVector3()
+        {
+            Vector3 A = Vector3.Zero;
+            Vector3 B = new Vector3(2.0d, 4.0d, 8.0d);
+
+            Vector3 none            = Vector3.Lerp(A, B, 0.0d);
+            Vector3 quarter         = Vector3.Lerp(A, B, 0.25d);
+            Vector3 half            = Vector3.Lerp(A, B, 0.5d);
+            Vector3 threeQuarter    = Vector3.Lerp(A, B, 0.75d);
+            Vector3 full            = Vector3.Lerp(A, B, 1.0d);
+
+            Assert.IsTrue(none.Equals(Vector3.Zero),                            "Lerp none failed.");
+            Assert.IsTrue(quarter.Equals(new Vector3(0.5d, 1.0d, 2.0d)),        "Lerp quarter failed.");
+            Assert.IsTrue(half.Equals(new Vector3(1.0d, 2.0d, 4.0d)),           "Lerp half failed.");
+            Assert.IsTrue(threeQuarter.Equals(new Vector3(1.5d, 3.0d, 6.0d)),   "Lerp three quarter failed.");
+            Assert.IsTrue(full.Equals(new Vector3(2.0d, 4.0d, 8.0d)),           "Lerp full failed.");
+        }
     }
 }

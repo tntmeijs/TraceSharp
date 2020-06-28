@@ -85,10 +85,32 @@ namespace PathTracer.Rendering
         /// <param name="lhs">Color to multiply</param>
         /// <param name="scalar">Scalar</param>
         /// <returns>Scaled color</returns>
-        public static Color operator *(Color lhs, double scalar)
-        {
-            return new Color(lhs.Data * scalar);
-        }
+        public static Color operator *(Color lhs, double scalar) => new Color(lhs.Data * scalar);
+
+        /// <summary>
+        /// Multiply two colors
+        /// </summary>
+        /// <param name="lhs">Left hand side color</param>
+        /// <param name="rhs">Right hand side color</param>
+        /// <returns>Multiplied color</returns>
+        public static Color operator *(Color lhs, Color rhs) => new Color(lhs.Data * rhs.Data);
+
+        /// <summary>
+        /// Add two colors
+        /// </summary>
+        /// <param name="lhs">Left hand side color</param>
+        /// <param name="rhs">Right hand side color</param>
+        /// <returns>Added colors</returns>
+        public static Color operator +(Color lhs, Color rhs) => new Color(lhs.Data + rhs.Data);
+
+        /// <summary>
+        /// Linearly interpolate between two colors
+        /// </summary>
+        /// <param name="A">Color A</param>
+        /// <param name="B">Color B</param>
+        /// <param name="t">Interpolation factor</param>
+        /// <returns>Interpolated color</returns>
+        public static Color Mix(Color A, Color B, double t) => new Color(Vector3.Lerp(A.Data, B.Data, t));
 
         /// <summary>
         /// Check if two colors are the same
