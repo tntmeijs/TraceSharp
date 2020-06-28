@@ -15,6 +15,7 @@ Samples per pixel | 256
 Bounces | 16
 Threads | 1
 Render time | 1043 seconds
+
 ![Basic path tracing](./Media/2_basic_path_tracing.png)
 
 ---
@@ -27,6 +28,7 @@ Samples per pixel | 1
 Bounces | 0
 Threads | 1
 Render time | 14 seconds
+
 ![Sphere intersection](./Media/1_sphere_intersection.png)
 
 ---
@@ -37,6 +39,7 @@ Type | statistics
 Resolution | 1280 x 720 pixels
 Threads | 1
 Render time | 14 seconds
+
 ![UV coordinates](./Media/0_uv_coordinates.png)
 
 ### Resources
