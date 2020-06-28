@@ -1,5 +1,5 @@
 ﻿using System;
-
+using PathTracer.Configuration;
 using PathTracer.Math;
 using PathTracer.Primitives;
 using PathTracer.Rendering;
@@ -186,33 +186,23 @@ namespace PathTracer
 
         static void Main(string[] args)
         {
-            // Minimum distance a ray must travel before an intersection is considered
-            // This prevents the ray from intersecting a surface it just bounced from
-            const double MINIMUM_RAY_LENGTH = 0.01d;
+            // Retrieve ray configuration information
+            double minRayLength     = ConfigurationParser.GetDouble("MIN_RAY_LENGTH");
+            double maxRayLength     = ConfigurationParser.GetDouble("MAX_RAY_LENGTH");
+            int maxBounces          = ConfigurationParser.GetInt("MAX_BOUNCES");
+            int samplesPerPixel     = ConfigurationParser.GetInt("SAMPLES_PER_PIXEL");
 
-            // Maximum length of a ray before it is considered a miss
-            const double MAXIMUM_RAY_LENGTH = 10000.0d;
+            // Retrieve camera configuration information
+            double exposure         = ConfigurationParser.GetDouble("EXPOSURE");
+            double fieldOfView      = ConfigurationParser.GetDouble("FIELD_OF_VIEW");
 
-            // Camera field of view in degrees
-            const double CAMERA_FOV = 90.0d;
+            // Retrieve image output configuration information
+            int outputWidth         = ConfigurationParser.GetInt("IMAGE_WIDTH");
+            int outputHeight        = ConfigurationParser.GetInt("IMAGE_HEIGHT");
+            string saveDirectory    = ConfigurationParser.GetString("SAVE_DIRECTORY");
+            string fileName         = ConfigurationParser.GetString("FILE_NAME");
 
-            const double EXPOSURE = 0.5d;
-
-            // Maximum number of bounces per ray
-            const int MAX_BOUNCES = 8;
-
-            // Samples per pixel
-            const int SAMPLES_PER_PIXEL = 2048;
-
-            // The path tracer will create images with a resolution of 1280x720
-            const int OUTPUT_WIDTH  = 1280;
-            const int OUTPUT_HEIGHT =  720;
-
-            // Output images will be saved here
-            const string OUTPUT_PATH = "./";
-            const string OUTPUT_NAME = "TraceSharp_output";
-
-            Image outputImage = new Image(OUTPUT_WIDTH, OUTPUT_HEIGHT);
+            Image outputImage = new Image(outputWidth, outputHeight);
 
             // Keep track of total render time
             var stopWatch = System.Diagnostics.Stopwatch.StartNew();
@@ -220,26 +210,26 @@ namespace PathTracer
 
             // Calculate a color for every pixel in the image
             int pixelIndex = 0;
-            for (int vInt = 0; vInt < OUTPUT_HEIGHT; ++vInt)
+            for (int vInt = 0; vInt < outputHeight; ++vInt)
             {
-                for (int uInt = 0; uInt < OUTPUT_WIDTH; ++uInt)
+                for (int uInt = 0; uInt < outputWidth; ++uInt)
                 {
                     // FOV to camera distance
-                    double cameraDistance = 1.0d / System.Math.Tan(CAMERA_FOV * 0.5d * System.Math.PI / 180.0d);
+                    double cameraDistance = 1.0d / System.Math.Tan(fieldOfView * 0.5d * System.Math.PI / 180.0d);
 
                     // Trace the scene for this pixel
                     Color outputColor = Color.Black;
                     Color previousFrameColor = Color.White;
 
-                    for (int i = 0; i < SAMPLES_PER_PIXEL; ++i)
+                    for (int i = 0; i < samplesPerPixel; ++i)
                     {
                         // Sub-pixel jitter for anti-aliasing
                         double subPixelJitterU = rng.NextDouble() - 0.5d;
                         double subPixelJitterV = rng.NextDouble() - 0.5d;
 
                         // Normalized UV coordinates
-                        double u = (uInt + subPixelJitterU) / OUTPUT_WIDTH;
-                        double v = (vInt + subPixelJitterV) / OUTPUT_HEIGHT;
+                        double u = (uInt + subPixelJitterU) / outputWidth;
+                        double v = (vInt + subPixelJitterV) / outputHeight;
 
                         // Invert the vertical range to flip the image to the correct orientation
                         v = 1.0d - v;
@@ -249,13 +239,13 @@ namespace PathTracer
                         v = (v * 2.0d) - 1.0d;
 
                         // Correct for the aspect ratio
-                        double aspectRatio = (double)OUTPUT_WIDTH / OUTPUT_HEIGHT;
+                        double aspectRatio = (double)outputWidth / outputHeight;
                         v /= aspectRatio;
 
                         // Ray starts at the camera origin and goes through the imaginary pixel rectangle
                         Ray cameraRay = new Ray(Vector3.Zero, new Vector3(u, v, cameraDistance));
 
-                        Color color = CalculatePixelColor(cameraRay, MINIMUM_RAY_LENGTH, MAXIMUM_RAY_LENGTH, MAX_BOUNCES);
+                        Color color = CalculatePixelColor(cameraRay, minRayLength, maxRayLength, maxBounces);
                         
                         // Average the color over the number of samples
                         // Each sample has less impact on the final image than the previous sample
@@ -264,7 +254,7 @@ namespace PathTracer
                     }
 
                     // Post processing steps
-                    outputColor *= EXPOSURE;
+                    outputColor *= exposure;
                     outputColor = Color.ToneMapACES(outputColor);
                     outputColor = Color.GammaCorrection(outputColor);
 
@@ -272,7 +262,7 @@ namespace PathTracer
                     outputImage.SetPixel(pixelIndex++, outputColor);
 
                     // Track render progress
-                    int percentageDone = (int)System.Math.Ceiling(pixelIndex / (double)(OUTPUT_WIDTH * OUTPUT_HEIGHT) * 100.0d);
+                    int percentageDone = (int)System.Math.Ceiling(pixelIndex / (double)(outputWidth * outputHeight) * 100.0d);
                     if (percentageDone % 5 == 0 && percentageDone > previousPercentage)
                     {
                         previousPercentage = percentageDone;
@@ -286,7 +276,7 @@ namespace PathTracer
             }
 
             // Store the result on disk to allow the user to see the results of the path tracer
-            if (!outputImage.SaveToPpm(OUTPUT_PATH, OUTPUT_NAME))
+            if (!outputImage.SaveToPpm(saveDirectory, fileName))
             {
                 Console.WriteLine("[ERROR] Failed to write ppm file to disk.");
             }
