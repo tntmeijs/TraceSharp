@@ -197,10 +197,10 @@ namespace PathTracer
             const double CAMERA_FOV = 90.0d;
 
             // Maximum number of bounces per ray
-            const int MAX_BOUNCES = 16;
+            const int MAX_BOUNCES = 4;
 
             // Samples per pixel
-            const int SAMPLES_PER_PIXEL = 256;
+            const int SAMPLES_PER_PIXEL = 8;
 
             // The path tracer will create images with a resolution of 1280x720
             const int OUTPUT_WIDTH  = 1280;
