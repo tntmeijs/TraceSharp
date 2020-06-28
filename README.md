@@ -5,6 +5,10 @@ I've tried my best to show the kind of code I would write in a production enviro
 
 The project itself isn't meant to be used as a production-grade renderer. It's just a fun and interesting way for me to show my skills.
 
+## Resources
+- Peter Shirley's "*Ray Tracing in a ___*" series
+- Alan Wolfe's "*casual path tracing*" blog posts.
+
 ## Timeline (reverse chronological order)
 
 ### 28/06/2020 @ 14:25 - basic path tracing
@@ -41,7 +45,3 @@ Threads | 1
 Render time | 14 seconds
 
 ![UV coordinates](./Media/0_uv_coordinates.png)
-
-### Resources
-- Peter Shirley's "*Ray Tracing in a ___*" series
-- Alan Wolfe's "*casual path tracing*" blog posts.
