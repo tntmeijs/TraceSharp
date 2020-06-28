@@ -113,6 +113,57 @@ namespace PathTracer.Rendering
         public static Color Mix(Color A, Color B, double t) => new Color(Vector3.Lerp(A.Data, B.Data, t));
 
         /// <summary>
+        /// Apply gamma correction to the color
+        /// Reference: https://learnopengl.com/Advanced-Lighting/Gamma-Correction
+        /// </summary>
+        /// <param name="color">Linear color</param>
+        /// <returns>Gamma-corrected color</returns>
+        public static Color GammaCorrection(Color color, double gamma = 2.2d)
+        {
+            double powR = System.Math.Pow(color.R, 1.0d / gamma);
+            double powG = System.Math.Pow(color.G, 1.0d / gamma);
+            double powB = System.Math.Pow(color.B, 1.0d / gamma);
+
+            return new Color(powR, powG, powB);
+        }
+
+        /// <summary>
+        /// Tone mapping
+        /// https://knarkowicz.wordpress.com/2016/01/06/aces-filmic-tone-mapping-curve/
+        /// </summary>
+        /// <param name="color">Color to apply ACES tone map to</param>
+        /// <returns>Tone mapped color</returns>
+        public static Color ToneMapACES(Color color)
+        {
+            double a = 2.51d;
+            double b = 0.03d;
+            double c = 2.43d;
+            double d = 0.59d;
+            double e = 0.14d;
+            
+            double clampedR = Functions.Clamp01((color.R * (a * color.R + b)) / (color.R * (c * color.R + d) + e));
+            double clampedG = Functions.Clamp01((color.G * (a * color.G + b)) / (color.G * (c * color.G + d) + e));
+            double clampedB = Functions.Clamp01((color.B * (a * color.B + b)) / (color.B * (c * color.B + d) + e));
+
+            return new Color(clampedR, clampedG, clampedB);
+        }
+
+        /// <summary>
+        /// Convert linear color space to SRGB color space
+        /// Reference: https://stackoverflow.com/a/34480536/11220609
+        /// </summary>
+        /// <param name="color">Linear color</param>
+        /// <returns>SRGB color</returns>
+        public static Color LinearToSRGB(Color color)
+        {
+            double red      = (color.R > 0.0031308d) ? 1.055d * (System.Math.Pow(color.R, (1.0d / 2.4d))) - 0.055d : 12.92d * color.R;
+            double green    = (color.R > 0.0031308d) ? 1.055d * (System.Math.Pow(color.G, (1.0d / 2.4d))) - 0.055d : 12.92d * color.G;
+            double blue     = (color.R > 0.0031308d) ? 1.055d * (System.Math.Pow(color.B, (1.0d / 2.4d))) - 0.055d : 12.92d * color.B;
+
+            return new Color(red, green, blue);
+        }
+
+        /// <summary>
         /// Check if two colors are the same
         /// </summary>
         /// <param name="obj">Color to check against</param>

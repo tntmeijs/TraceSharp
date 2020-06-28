@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Math\Functions.cs" />
     <Compile Include="Math\Ray.cs" />
     <Compile Include="Primitives\PrimitiveBase.cs" />
     <Compile Include="Primitives\PrimitiveHitInfo.cs" />

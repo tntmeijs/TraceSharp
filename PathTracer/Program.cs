@@ -196,11 +196,13 @@ namespace PathTracer
             // Camera field of view in degrees
             const double CAMERA_FOV = 90.0d;
 
+            const double EXPOSURE = 0.5d;
+
             // Maximum number of bounces per ray
-            const int MAX_BOUNCES = 4;
+            const int MAX_BOUNCES = 8;
 
             // Samples per pixel
-            const int SAMPLES_PER_PIXEL = 8;
+            const int SAMPLES_PER_PIXEL = 2048;
 
             // The path tracer will create images with a resolution of 1280x720
             const int OUTPUT_WIDTH  = 1280;
@@ -222,26 +224,8 @@ namespace PathTracer
             {
                 for (int uInt = 0; uInt < OUTPUT_WIDTH; ++uInt)
                 {
-                    // Normalized UV coordinates
-                    double u = (double)uInt / OUTPUT_WIDTH;
-                    double v = (double)vInt / OUTPUT_HEIGHT;
-
-                    // Invert the vertical range to flip the image to the correct orientation
-                    v = 1.0d - v;
-
-                    // Transform from 0 - 1 to -1 - 1
-                    u = (u * 2.0d) - 1.0d;
-                    v = (v * 2.0d) - 1.0d;
-
-                    // Correct for the aspect ratio
-                    double aspectRatio = (double)OUTPUT_WIDTH / OUTPUT_HEIGHT;
-                    v /= aspectRatio;
-
                     // FOV to camera distance
                     double cameraDistance = 1.0d / System.Math.Tan(CAMERA_FOV * 0.5d * System.Math.PI / 180.0d);
-
-                    // Ray starts at the camera origin and goes through the imaginary pixel rectangle
-                    Ray cameraRay = new Ray(Vector3.Zero, new Vector3(u, v, cameraDistance));
 
                     // Trace the scene for this pixel
                     Color outputColor = Color.Black;
@@ -249,6 +233,28 @@ namespace PathTracer
 
                     for (int i = 0; i < SAMPLES_PER_PIXEL; ++i)
                     {
+                        // Sub-pixel jitter for anti-aliasing
+                        double subPixelJitterU = rng.NextDouble() - 0.5d;
+                        double subPixelJitterV = rng.NextDouble() - 0.5d;
+
+                        // Normalized UV coordinates
+                        double u = (uInt + subPixelJitterU) / OUTPUT_WIDTH;
+                        double v = (vInt + subPixelJitterV) / OUTPUT_HEIGHT;
+
+                        // Invert the vertical range to flip the image to the correct orientation
+                        v = 1.0d - v;
+
+                        // Transform from 0 - 1 to -1 - 1
+                        u = (u * 2.0d) - 1.0d;
+                        v = (v * 2.0d) - 1.0d;
+
+                        // Correct for the aspect ratio
+                        double aspectRatio = (double)OUTPUT_WIDTH / OUTPUT_HEIGHT;
+                        v /= aspectRatio;
+
+                        // Ray starts at the camera origin and goes through the imaginary pixel rectangle
+                        Ray cameraRay = new Ray(Vector3.Zero, new Vector3(u, v, cameraDistance));
+
                         Color color = CalculatePixelColor(cameraRay, MINIMUM_RAY_LENGTH, MAXIMUM_RAY_LENGTH, MAX_BOUNCES);
                         
                         // Average the color over the number of samples
@@ -256,6 +262,11 @@ namespace PathTracer
                         outputColor = Color.Mix(previousFrameColor, color, 1.0d / (i + 1));
                         previousFrameColor = outputColor;
                     }
+
+                    // Post processing steps
+                    outputColor *= EXPOSURE;
+                    outputColor = Color.ToneMapACES(outputColor);
+                    outputColor = Color.GammaCorrection(outputColor);
 
                     // Save the data to disk
                     outputImage.SetPixel(pixelIndex++, outputColor);

@@ -151,5 +151,17 @@ namespace UnitTests.Rendering
             Assert.IsTrue(threeQuarter.Equals(new Color(0.75d, 0.75d, 0.75d)),  "Mix three quarter failed.");
             Assert.IsTrue(full.Equals(Color.White),                             "Mix full failed.");
         }
+
+        [TestMethod]
+        public void TestGammaCorrectionColor()
+        {
+            Color color = new Color(0.9d, 0.3d, 0.6d);
+            color = Color.GammaCorrection(color);
+
+            // Approximate the gamma values to account for any precision errors
+            Assert.IsTrue(color.R > 0.95d && color.R < 0.96d, "Red component was not correctly gamma-corrected.");
+            Assert.IsTrue(color.G > 0.57d && color.G < 0.58d, "Green component was not correctly gamma-corrected.");
+            Assert.IsTrue(color.B > 0.79d && color.B < 0.80d, "Blue component was not correctly gamma-corrected.");
+        }
     }
 }
