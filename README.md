@@ -7,6 +7,13 @@ The project itself isn't meant to be used as a production-grade renderer. It's j
 
 There are a lot of things I would've liked to implement but in the end this project is not meant to be a renderer. It is meant to show you a typical example of the quality of my code in a somewhat professional environment.
 
+## Learning goals
+- Unit testing
+- Clean code
+- Object-oriented programming
+- Multi-threading
+- File I/O
+
 ## Project structure
 - [Media](./Media) contains various screenshots taken while developing the application.
 - [PathTracer](./PathTracer) is the project directory.
