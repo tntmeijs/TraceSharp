@@ -269,7 +269,7 @@ namespace PathTracer.Rendering
 
                 // Construct a new ray
                 rayPos = (rayPos + rayDir * closestHitInfo.Distance) + closestHitInfo.Normal * EPSILON;
-                rayDir = closestHitInfo.Normal + Functions.RandomUnitVector(RandomNumberGenerator);
+                rayDir = (closestHitInfo.Normal + Functions.RandomUnitVector(RandomNumberGenerator)).Normalized;
 
                 // Add emissive lighting
                 color += closestHitInfo.Emissive * throughput;
