@@ -6,11 +6,16 @@ using System.Threading.Tasks;
 using PathTracer.Configuration;
 using PathTracer.Math;
 using PathTracer.Primitives;
+using System.Threading;
+using System.Linq;
 
 namespace PathTracer.Rendering
 {
     class Renderer
     {
+        /// <summary>
+        /// Rendering settings (will be retrieved from App.config)
+        /// </summary>
         private readonly double MinRayLength;
         private readonly double MaxRayLength;
         private readonly double Exposure;
@@ -21,13 +26,17 @@ namespace PathTracer.Rendering
         private readonly int OutputWidth;
         private readonly int OutputHeight;
 
+        /// <summary>
+        /// When writing image data to disk, this is where it will end up
+        /// </summary>
         private readonly string SaveDirectory;
         private readonly string FileName;
 
+        /// <summary>
+        /// Image data used as the path tracer's output
+        /// </summary>
         private readonly Image OutputImage;
         private readonly object OutputImageLock;
-
-        private readonly Random RandomNumberGenerator;
 
         /// <summary>
         /// Lines left to render
@@ -65,8 +74,6 @@ namespace PathTracer.Rendering
             OutputImage             = new Image(OutputWidth, OutputHeight);
             OutputImageLock         = new object();
 
-            RandomNumberGenerator   = new Random();
-
             LinesLeftToRender       = new ConcurrentBag<int>();
 
             Scene = new List<PrimitiveBase>();
@@ -92,22 +99,26 @@ namespace PathTracer.Rendering
                 LinesLeftToRender.Add(i);
             }
 
-            // Spawn tasks
-            int processorCount = 1; //#DEBUG: Multithreading does not work yet!
-            Task[] tasks = new Task[processorCount];
+            // Determine the optimal number of threads to run
+            int processorCount = Environment.ProcessorCount;
+            Thread[] threads = new Thread[processorCount];
 
             Console.WriteLine("[INFO] Renderer will use " + processorCount + " logical processors to render.");
 
-            // Start rendering on all available logical processors
-            for (int i = 0; i < tasks.Length; ++i)
+            // Spawn threads
+            for (int i = 0; i < threads.Length; ++i)
             {
-                tasks[i] = Task.Factory.StartNew(RenderTask);
+                threads[i] = new Thread(new ThreadStart(RenderTask));
+                threads[i].Start();
             }
 
             Console.WriteLine("[INFO] Render tasks have started, waiting...");
 
-            // Wait for the job to complete
-            Task.WaitAll(tasks);
+            // Wait for all jobs to complete
+            for (int i = 0; i < threads.Length; ++i)
+            {
+                threads[i].Join();
+            }
 
             Console.WriteLine("[INFO] Render tasks have finished executing.");
         }
@@ -119,6 +130,9 @@ namespace PathTracer.Rendering
         /// </summary>
         public void RenderTask()
         {
+            // One random number generator instance per thread as it is not thread safe
+            Random randomNumberGenerator = new Random(Guid.NewGuid().GetHashCode());
+
             while (true)
             {
                 // Collection is empty, no more lines left to render
@@ -128,7 +142,7 @@ namespace PathTracer.Rendering
                 }
 
                 // Render this line
-                Color[] pixelData = ProcessLine(lineIndex);
+                Color[] pixelData = ProcessLine(lineIndex, randomNumberGenerator);
 
                 // Save the line data
                 for (int i = 0; i < pixelData.Length; ++i)
@@ -177,8 +191,9 @@ namespace PathTracer.Rendering
         /// Process a single line of the output picture
         /// </summary>
         /// <param name="lineIndex">Row number of the line to process</param>
+        /// <param name="randomNumberGenerator">Random number generator used on this thread</param>
         /// <returns>Array of pixel colors</returns>
-        public Color[] ProcessLine(int lineIndex)
+        public Color[] ProcessLine(int lineIndex, Random randomNumberGenerator)
         {
             Color[] output = new Color[OutputWidth];
 
@@ -194,8 +209,8 @@ namespace PathTracer.Rendering
                 for (int i = 0; i < SamplesPerPixel; ++i)
                 {
                     // Sub-pixel jitter for anti-aliasing
-                    double subPixelJitterU = RandomNumberGenerator.NextDouble() - 0.5d;
-                    double subPixelJitterV = RandomNumberGenerator.NextDouble() - 0.5d;
+                    double subPixelJitterU = randomNumberGenerator.NextDouble() - 0.5d;
+                    double subPixelJitterV = randomNumberGenerator.NextDouble() - 0.5d;
 
                     // Normalized UV coordinates
                     double u = (uInt + subPixelJitterU) / OutputWidth;
@@ -215,7 +230,8 @@ namespace PathTracer.Rendering
                     // Ray starts at the camera origin and goes through the imaginary pixel rectangle
                     Ray cameraRay = new Ray(Vector3.Zero, new Vector3(u, v, cameraDistance));
 
-                    Color color = TracePixel(cameraRay);
+                    // Simulate light traveling through the scene
+                    Color color = TracePixel(cameraRay, randomNumberGenerator);
 
                     // Average the color over the number of samples
                     // Each sample has less impact on the final image than the previous sample
@@ -229,7 +245,13 @@ namespace PathTracer.Rendering
             return output;
         }
 
-        public Color TracePixel(Ray ray)
+        /// <summary>
+        /// Simulate a ray of light for a single pixel
+        /// </summary>
+        /// <param name="ray">Ray used to simulate the light for</param>
+        /// <param name="randomNumberGenerator">Random number generator used on this thread</param>
+        /// <returns>Color of the pixel</returns>
+        public Color TracePixel(Ray ray, Random randomNumberGenerator)
         {
             Color color = Color.Black;
             Color throughput = Color.White;
@@ -264,7 +286,7 @@ namespace PathTracer.Rendering
 
                 // Construct a new ray
                 ray.Origin = (ray.Origin + ray.Direction * closestHitInfo.Distance) + closestHitInfo.Normal * EPSILON;
-                ray.Direction = closestHitInfo.Normal + Functions.RandomUnitVector(RandomNumberGenerator);
+                ray.Direction = closestHitInfo.Normal + Functions.RandomUnitVector(randomNumberGenerator);
 
                 // Add emissive lighting
                 color += closestHitInfo.Emissive * throughput;

@@ -11,7 +11,7 @@ There are a lot of things I would've liked to implement but in the end this proj
 - Unit testing
 - Clean code
 - Object-oriented programming
-- Multi-threading
+- Multi-threading (work in progress)
 - File I/O
 
 ## Project structure
@@ -37,7 +37,7 @@ Feel free to play around with it to see what effect it has on the final image.
 - Alan Wolfe's "*casual path tracing*" blog posts.
 
 ## Sample output
-![Basic path tracing](./Media/4_tone_mapping_exposure.png)
+![Basic path tracing](./Media/5_fixed_normals.png)
 
 Type | statistics
 ------------ | -------------
