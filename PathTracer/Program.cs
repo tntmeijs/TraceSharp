@@ -11,6 +11,21 @@ namespace PathTracer
         static readonly Random rng = new Random();
 
         /// <summary>
+        /// Some data to easily pass around scene information
+        /// </summary>
+        struct RenderData
+        {
+            public int imageWidth;
+            public int imageHeight;
+            public int currentLineIndex;
+            public int maxBounces;
+            public int samplesPerPixel;
+            public double minRayLength;
+            public double maxRayLength;
+            public double fieldOfView;
+        }
+
+        /// <summary>
         /// Cosine weighted random unit vector generation
         /// </summary>
         /// <returns></returns>
@@ -184,6 +199,61 @@ namespace PathTracer
             return color;
         }
 
+        /// <summary>
+        /// Render a single line of the image
+        /// </summary>
+        /// <returns>Array of colors for the pixels on this line</returns>
+        static Color[] RenderLine(RenderData data)
+        {
+            Color[] output = new Color[data.imageWidth];
+
+            for (int uInt = 0; uInt < data.imageWidth; ++uInt)
+            {
+                // FOV to camera distance
+                double cameraDistance = 1.0d / System.Math.Tan(data.fieldOfView * 0.5d * System.Math.PI / 180.0d);
+
+                // Trace the scene for this pixel
+                Color outputColor = Color.Black;
+                Color previousFrameColor = Color.White;
+
+                for (int i = 0; i < data.samplesPerPixel; ++i)
+                {
+                    // Sub-pixel jitter for anti-aliasing
+                    double subPixelJitterU = rng.NextDouble() - 0.5d;
+                    double subPixelJitterV = rng.NextDouble() - 0.5d;
+
+                    // Normalized UV coordinates
+                    double u = (uInt + subPixelJitterU) / data.imageWidth;
+                    double v = (data.currentLineIndex + subPixelJitterV) / data.imageHeight;
+
+                    // Invert the vertical range to flip the image to the correct orientation
+                    v = 1.0d - v;
+
+                    // Transform from 0 - 1 to -1 - 1
+                    u = (u * 2.0d) - 1.0d;
+                    v = (v * 2.0d) - 1.0d;
+
+                    // Correct for the aspect ratio
+                    double aspectRatio = (double)data.imageWidth / data.imageHeight;
+                    v /= aspectRatio;
+
+                    // Ray starts at the camera origin and goes through the imaginary pixel rectangle
+                    Ray cameraRay = new Ray(Vector3.Zero, new Vector3(u, v, cameraDistance));
+
+                    Color color = CalculatePixelColor(cameraRay, data.minRayLength, data.maxRayLength, data.maxBounces);
+
+                    // Average the color over the number of samples
+                    // Each sample has less impact on the final image than the previous sample
+                    outputColor = Color.Mix(previousFrameColor, color, 1.0d / (i + 1));
+                    previousFrameColor = outputColor;
+                }
+
+                output[uInt] = outputColor;
+            }
+
+            return output;
+        }
+
         static void Main(string[] args)
         {
             // Retrieve ray configuration information
@@ -204,74 +274,36 @@ namespace PathTracer
 
             Image outputImage = new Image(outputWidth, outputHeight);
 
-            // Keep track of total render time
-            var stopWatch = System.Diagnostics.Stopwatch.StartNew();
-            int previousPercentage = 0;
+            // Render information needed when tracing the scene
+            RenderData data = new RenderData();
+            data.imageWidth = outputWidth;
+            data.imageHeight = outputHeight;
+            data.maxBounces = maxBounces;
+            data.samplesPerPixel = samplesPerPixel;
+            data.fieldOfView = fieldOfView;
+            data.minRayLength = minRayLength;
+            data.maxRayLength = maxRayLength;
+            data.currentLineIndex = 0;
 
             // Calculate a color for every pixel in the image
             int pixelIndex = 0;
             for (int vInt = 0; vInt < outputHeight; ++vInt)
             {
-                for (int uInt = 0; uInt < outputWidth; ++uInt)
+                data.currentLineIndex = vInt;
+
+                Color[] pixelData = RenderLine(data);
+
+                // Save the line data in the final image
+                foreach (Color pixel in pixelData)
                 {
-                    // FOV to camera distance
-                    double cameraDistance = 1.0d / System.Math.Tan(fieldOfView * 0.5d * System.Math.PI / 180.0d);
-
-                    // Trace the scene for this pixel
-                    Color outputColor = Color.Black;
-                    Color previousFrameColor = Color.White;
-
-                    for (int i = 0; i < samplesPerPixel; ++i)
-                    {
-                        // Sub-pixel jitter for anti-aliasing
-                        double subPixelJitterU = rng.NextDouble() - 0.5d;
-                        double subPixelJitterV = rng.NextDouble() - 0.5d;
-
-                        // Normalized UV coordinates
-                        double u = (uInt + subPixelJitterU) / outputWidth;
-                        double v = (vInt + subPixelJitterV) / outputHeight;
-
-                        // Invert the vertical range to flip the image to the correct orientation
-                        v = 1.0d - v;
-
-                        // Transform from 0 - 1 to -1 - 1
-                        u = (u * 2.0d) - 1.0d;
-                        v = (v * 2.0d) - 1.0d;
-
-                        // Correct for the aspect ratio
-                        double aspectRatio = (double)outputWidth / outputHeight;
-                        v /= aspectRatio;
-
-                        // Ray starts at the camera origin and goes through the imaginary pixel rectangle
-                        Ray cameraRay = new Ray(Vector3.Zero, new Vector3(u, v, cameraDistance));
-
-                        Color color = CalculatePixelColor(cameraRay, minRayLength, maxRayLength, maxBounces);
-                        
-                        // Average the color over the number of samples
-                        // Each sample has less impact on the final image than the previous sample
-                        outputColor = Color.Mix(previousFrameColor, color, 1.0d / (i + 1));
-                        previousFrameColor = outputColor;
-                    }
+                    Color finalColor = pixel;
 
                     // Post processing steps
-                    outputColor *= exposure;
-                    outputColor = Color.ToneMapACES(outputColor);
-                    outputColor = Color.GammaCorrection(outputColor);
+                    finalColor *= exposure;
+                    finalColor = Color.ToneMapACES(finalColor);
+                    finalColor = Color.GammaCorrection(finalColor);
 
-                    // Save the data to disk
-                    outputImage.SetPixel(pixelIndex++, outputColor);
-
-                    // Track render progress
-                    int percentageDone = (int)System.Math.Ceiling(pixelIndex / (double)(outputWidth * outputHeight) * 100.0d);
-                    if (percentageDone % 5 == 0 && percentageDone > previousPercentage)
-                    {
-                        previousPercentage = percentageDone;
-
-                        long timeElapsedSeconds = (long)stopWatch.Elapsed.TotalSeconds;
-                        string suffix = timeElapsedSeconds == 1 ? "second" : "seconds";
-
-                        Console.WriteLine("Progress: " + percentageDone + "%\t-\ttook " + timeElapsedSeconds + "\t" + suffix + ".");
-                    }
+                    outputImage.SetPixel(pixelIndex++, finalColor);
                 }
             }
 
@@ -281,7 +313,6 @@ namespace PathTracer
                 Console.WriteLine("[ERROR] Failed to write ppm file to disk.");
             }
 
-            stopWatch.Stop();
             Console.WriteLine("\n\nPress <Enter> to continue.");
             Console.Read();
         }
