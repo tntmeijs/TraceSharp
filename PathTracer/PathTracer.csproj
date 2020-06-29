@@ -58,6 +58,7 @@
     <Compile Include="Rendering\Image.cs" />
     <Compile Include="Rendering\Color.cs" />
     <Compile Include="Rendering\Material.cs" />
+    <Compile Include="Renderer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
