@@ -229,8 +229,6 @@ namespace PathTracer.Rendering
             return output;
         }
 
-        public object obj = new object();
-
         public Color TracePixel(Ray ray)
         {
             Color color = Color.Black;
