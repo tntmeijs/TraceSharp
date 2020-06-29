@@ -32,6 +32,8 @@ namespace PathTracer.Primitives
         {
             Distance    = 0.0d;
             Normal      = Vector3.Zero;
+            Albedo      = Color.Black;
+            Emissive    = Color.Black;
         }
     }
 }
