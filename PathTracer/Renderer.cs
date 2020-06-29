@@ -239,9 +239,6 @@ namespace PathTracer.Rendering
             // Epsilon is used to prevent the new ray origin from starting inside the surface
             const double EPSILON = 0.01d;
 
-            Vector3 rayPos = ray.Origin;
-            Vector3 rayDir = ray.Direction;
-
             for (int i = 0; i < MaxBounces; ++i)
             {
                 PrimitiveHitInfo closestHitInfo = new PrimitiveHitInfo()
@@ -252,7 +249,7 @@ namespace PathTracer.Rendering
                 // Trace against the scene
                 foreach (PrimitiveBase primitive in Scene)
                 {
-                    PrimitiveHitInfo hitInfo = primitive.TestRayIntersection(new Ray(rayPos, rayDir), MinRayLength, MaxRayLength);
+                    PrimitiveHitInfo hitInfo = primitive.TestRayIntersection(ray, MinRayLength, MaxRayLength);
 
                     // Save the result if the hit is closer to the camera than the current closest hit
                     if (hitInfo.DidHit && hitInfo.Distance < closestHitInfo.Distance)
@@ -268,8 +265,8 @@ namespace PathTracer.Rendering
                 }
 
                 // Construct a new ray
-                rayPos = (rayPos + rayDir * closestHitInfo.Distance) + closestHitInfo.Normal * EPSILON;
-                rayDir = (closestHitInfo.Normal + Functions.RandomUnitVector(RandomNumberGenerator)).Normalized;
+                ray.Origin = (ray.Origin + ray.Direction * closestHitInfo.Distance) + closestHitInfo.Normal * EPSILON;
+                ray.Direction = closestHitInfo.Normal + Functions.RandomUnitVector(RandomNumberGenerator);
 
                 // Add emissive lighting
                 color += closestHitInfo.Emissive * throughput;
