@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
+using System.Threading.Tasks;
 
 using PathTracer.Configuration;
 using PathTracer.Math;
@@ -23,13 +25,21 @@ namespace PathTracer.Rendering
         private readonly string FileName;
 
         private readonly Image OutputImage;
+        private readonly object OutputImageLock;
 
         private readonly Random RandomNumberGenerator;
 
         /// <summary>
+        /// Lines left to render
+        /// This is used to give tasks jobs to run
+        /// Each line index represents a line of the output image
+        /// </summary>
+        private readonly ConcurrentBag<int> LinesLeftToRender;
+
+        /// <summary>
         /// Scene containing all primitives to trace against
         /// </summary>
-        private List<PrimitiveBase> Scene;
+        private readonly List<PrimitiveBase> Scene;
 
         /// <summary>
         /// Construct a new renderer
@@ -37,24 +47,27 @@ namespace PathTracer.Rendering
         public Renderer()
         {
             // Retrieve ray configuration information
-            MinRayLength    = ConfigurationParser.GetDouble("MIN_RAY_LENGTH");
-            MaxRayLength    = ConfigurationParser.GetDouble("MAX_RAY_LENGTH");
-            MaxBounces      = ConfigurationParser.GetInt("MAX_BOUNCES");
-            SamplesPerPixel = ConfigurationParser.GetInt("SAMPLES_PER_PIXEL");
+            MinRayLength            = ConfigurationParser.GetDouble("MIN_RAY_LENGTH");
+            MaxRayLength            = ConfigurationParser.GetDouble("MAX_RAY_LENGTH");
+            MaxBounces              = ConfigurationParser.GetInt("MAX_BOUNCES");
+            SamplesPerPixel         = ConfigurationParser.GetInt("SAMPLES_PER_PIXEL");
 
             // Retrieve camera configuration information
-            Exposure        = ConfigurationParser.GetDouble("EXPOSURE");
-            FieldOfView     = ConfigurationParser.GetDouble("FIELD_OF_VIEW");
+            Exposure                = ConfigurationParser.GetDouble("EXPOSURE");
+            FieldOfView             = ConfigurationParser.GetDouble("FIELD_OF_VIEW");
 
             // Retrieve image output configuration information
-            OutputWidth     = ConfigurationParser.GetInt("IMAGE_WIDTH");
-            OutputHeight    = ConfigurationParser.GetInt("IMAGE_HEIGHT");
-            SaveDirectory   = ConfigurationParser.GetString("SAVE_DIRECTORY");
-            FileName        = ConfigurationParser.GetString("FILE_NAME");
+            OutputWidth             = ConfigurationParser.GetInt("IMAGE_WIDTH");
+            OutputHeight            = ConfigurationParser.GetInt("IMAGE_HEIGHT");
+            SaveDirectory           = ConfigurationParser.GetString("SAVE_DIRECTORY");
+            FileName                = ConfigurationParser.GetString("FILE_NAME");
 
-            OutputImage = new Image(OutputWidth, OutputHeight);
+            OutputImage             = new Image(OutputWidth, OutputHeight);
+            OutputImageLock         = new object();
 
-            RandomNumberGenerator = new Random();
+            RandomNumberGenerator   = new Random();
+
+            LinesLeftToRender       = new ConcurrentBag<int>();
 
             Scene = new List<PrimitiveBase>();
         }
@@ -69,24 +82,68 @@ namespace PathTracer.Rendering
         }
 
         /// <summary>
-        /// Start rendering the scene
+        /// Start rendering the scene on as many threads as possible
         /// </summary>
         public void Start()
         {
-            int pixelIndex = 0;
-
-            for (int vInt = 0; vInt < OutputHeight; ++vInt)
+            // Generate a list of line indices to render
+            for (int i = 0; i < OutputHeight; ++i)
             {
-                Color[] pixelData = ProcessLine(vInt);
+                LinesLeftToRender.Add(i);
+            }
 
-                // Save the line data in the final image
-                foreach (Color pixel in pixelData)
+            // Spawn tasks
+            int processorCount = 1; //#DEBUG: Multithreading does not work yet!
+            Task[] tasks = new Task[processorCount];
+
+            Console.WriteLine("[INFO] Renderer will use " + processorCount + " logical processors to render.");
+
+            // Start rendering on all available logical processors
+            for (int i = 0; i < tasks.Length; ++i)
+            {
+                tasks[i] = Task.Factory.StartNew(RenderTask);
+            }
+
+            Console.WriteLine("[INFO] Render tasks have started, waiting...");
+
+            // Wait for the job to complete
+            Task.WaitAll(tasks);
+
+            Console.WriteLine("[INFO] Render tasks have finished executing.");
+        }
+
+        /// <summary>
+        /// Task that will keep grabbing a new line from the list of lines left to render
+        /// The task will render the line and save it to the image
+        /// Once a line is done, a new line will be fetched from the list until no lines are left
+        /// </summary>
+        public void RenderTask()
+        {
+            while (true)
+            {
+                // Collection is empty, no more lines left to render
+                if (!LinesLeftToRender.TryTake(out int lineIndex))
+                {
+                    break;
+                }
+
+                // Render this line
+                Color[] pixelData = ProcessLine(lineIndex);
+
+                // Save the line data
+                for (int i = 0; i < pixelData.Length; ++i)
                 {
                     // Post processing steps
-                    Color finalColor = ApplyPostProcessing(pixel);
+                    Color finalColor = ApplyPostProcessing(pixelData[i]);
+
+                    // Index in the final image
+                    int absolutePixelIndex = (lineIndex * OutputWidth) + i;
 
                     // Store the result
-                    OutputImage.SetPixel(pixelIndex++, finalColor);
+                    lock (OutputImageLock)
+                    {
+                        OutputImage.SetPixel(absolutePixelIndex, finalColor);
+                    }
                 }
             }
         }
@@ -172,6 +229,8 @@ namespace PathTracer.Rendering
             return output;
         }
 
+        public object obj = new object();
+
         public Color TracePixel(Ray ray)
         {
             Color color = Color.Black;
@@ -185,34 +244,38 @@ namespace PathTracer.Rendering
 
             for (int i = 0; i < MaxBounces; ++i)
             {
-                PrimitiveHitInfo hitInfo = new PrimitiveHitInfo();
-                hitInfo.Distance = MaxRayLength;
+                PrimitiveHitInfo closestHitInfo = new PrimitiveHitInfo()
+                {
+                    Distance = MaxRayLength
+                };
 
                 // Trace against the scene
                 foreach (PrimitiveBase primitive in Scene)
                 {
-                    if (primitive.TestRayIntersection(new Ray(rayPos, rayDir), MinRayLength, MaxRayLength, ref hitInfo))
+                    PrimitiveHitInfo hitInfo = primitive.TestRayIntersection(new Ray(rayPos, rayDir), MinRayLength, MaxRayLength);
+
+                    // Save the result if the hit is closer to the camera than the current closest hit
+                    if (hitInfo.DidHit && hitInfo.Distance < closestHitInfo.Distance)
                     {
-                        hitInfo.Albedo = primitive.Material.Albedo;
-                        hitInfo.Emissive = primitive.Material.Emissive * primitive.Material.EmissiveStrength;
+                        closestHitInfo = hitInfo;
                     }
                 }
 
                 // Ray missed
-                if (hitInfo.Distance == MaxRayLength)
+                if (closestHitInfo.Distance == MaxRayLength)
                 {
                     break;
                 }
 
                 // Construct a new ray
-                rayPos = (rayPos + rayDir * hitInfo.Distance) + hitInfo.Normal * EPSILON;
-                rayDir = hitInfo.Normal + Functions.RandomUnitVector(RandomNumberGenerator);
+                rayPos = (rayPos + rayDir * closestHitInfo.Distance) + closestHitInfo.Normal * EPSILON;
+                rayDir = closestHitInfo.Normal + Functions.RandomUnitVector(RandomNumberGenerator);
 
                 // Add emissive lighting
-                color += hitInfo.Emissive * throughput;
+                color += closestHitInfo.Emissive * throughput;
 
                 // When a ray bounces off a surface, all future lighting for that ray is multiplied by the color of that surface
-                throughput *= hitInfo.Albedo;
+                throughput *= closestHitInfo.Albedo;
             }
 
             return color;

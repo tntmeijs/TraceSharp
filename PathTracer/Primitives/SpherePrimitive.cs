@@ -44,10 +44,15 @@ namespace PathTracer.Primitives
         /// <param name="ray">Ray to test against</param>
         /// <param name="minHitDistance">Minimum distance from the ray's origin before a hit is considered</param>
         /// <param name="maxHitDistance">Maximum distance from the ray's origin before a miss is considered</param>
-        /// <param name="hitInfo">Hit information</param>
-        /// <returns>True when the ray intersects the sphere, false otherwise</returns>
-        public override bool TestRayIntersection(Ray ray, double minHitDistance, double maxHitDistance, ref PrimitiveHitInfo hitInfo)
+        /// <returns>Hit information</returns>
+        public override PrimitiveHitInfo TestRayIntersection(Ray ray, double minHitDistance, double maxHitDistance)
         {
+            PrimitiveHitInfo hitInfo = new PrimitiveHitInfo()
+            {
+                Albedo = Material.Albedo,
+                Emissive = Material.Emissive * Material.EmissiveStrength
+            };
+
             // Vector from center of the sphere to where the ray begins
             Vector3 m = ray.Origin - Center;
 
@@ -56,7 +61,7 @@ namespace PathTracer.Primitives
 
             if (c > 0.0d && b > 0.0d)
             {
-                return false;
+                return hitInfo;
             }
 
             // Discriminant (quadratic formula)
@@ -65,7 +70,7 @@ namespace PathTracer.Primitives
             // Ray misses the sphere
             if (d < 0.0d)
             {
-                return false;
+                return hitInfo;
             }
 
             // Compute smallest value of intersection
@@ -78,14 +83,15 @@ namespace PathTracer.Primitives
                 distance = -b + System.Math.Sqrt(d);
             }
 
-            if (distance > minHitDistance && distance < hitInfo.Distance)
+            if (distance > minHitDistance && distance < maxHitDistance)
             {
                 hitInfo.Distance = distance;
                 hitInfo.Normal = ((ray.Origin + (ray.Direction * distance)) - Center).Normalized * (inside ? -1.0d : 1.0d);
-                return true;
+                hitInfo.DidHit = true;
+                return hitInfo;
             }
 
-            return false;
+            return hitInfo;
         }
     }
 }

@@ -6,6 +6,12 @@ namespace PathTracer.Primitives
     class PrimitiveHitInfo
     {
         /// <summary>
+        /// Did the ray hit a surface?
+        /// If this is false, the entire hit information structure should be discarded
+        /// </summary>
+        public bool DidHit;
+
+        /// <summary>
         /// Distance to the hit
         /// </summary>
         public double Distance;
@@ -30,6 +36,7 @@ namespace PathTracer.Primitives
         /// </summary>
         public PrimitiveHitInfo()
         {
+            DidHit      = false;
             Distance    = 0.0d;
             Normal      = Vector3.Zero;
             Albedo      = Color.Black;

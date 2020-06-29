@@ -60,10 +60,15 @@ namespace PathTracer.Primitives
         /// <param name="ray">Ray to test against</param>
         /// <param name="minHitDistance">Minimum distance from the ray's origin before a hit is considered</param>
         /// <param name="maxHitDistance">Maximum distance from the ray's origin before a miss is considered</param>
-        /// <param name="hitInfo">Hit information</param>
-        /// <returns>True when the ray intersects the sphere, false otherwise</returns>
-        public override bool TestRayIntersection(Ray ray, double minHitDistance, double maxHitDistance, ref PrimitiveHitInfo hitInfo)
+        /// <returns>Hit information</returns>
+        public override PrimitiveHitInfo TestRayIntersection(Ray ray, double minHitDistance, double maxHitDistance)
         {
+            PrimitiveHitInfo hitInfo = new PrimitiveHitInfo()
+            {
+                Albedo = Material.Albedo,
+                Emissive = Material.Emissive * Material.EmissiveStrength
+            };
+
             // Calculate the normal vector
             Vector3 normal = Vector3.Cross(TopRight - BottomLeft, TopRight - BottomRight).Normalized;
 
@@ -100,14 +105,14 @@ namespace PathTracer.Primitives
 
                 if (u < 0.0d)
                 {
-                    return false;
+                    return hitInfo;
                 }
 
                 double w = ScalarTripleProduct(pq, pb, pa);
 
                 if (w < 0.0d)
                 {
-                    return false;
+                    return hitInfo;
                 }
 
                 double denominator = 1.0d / (u + v + w);
@@ -125,14 +130,14 @@ namespace PathTracer.Primitives
 
                 if (u < 0.0d)
                 {
-                    return false;
+                    return hitInfo;
                 }
 
                 double w = ScalarTripleProduct(pq, pa, pd);
 
                 if (w < 0.0d)
                 {
-                    return false;
+                    return hitInfo;
                 }
 
                 v = -v;
@@ -159,14 +164,15 @@ namespace PathTracer.Primitives
                 distance = (intersectPosition.Z - ray.Origin.Z) / ray.Direction.Z;
             }
 
-            if (distance > minHitDistance && distance < hitInfo.Distance)
+            if (distance > minHitDistance && distance < maxHitDistance)
             {
                 hitInfo.Distance = distance;
                 hitInfo.Normal = normal;
-                return true;
+                hitInfo.DidHit = true;
+                return hitInfo;
             }
 
-            return false;
+            return hitInfo;
         }
 
         /// <summary>
