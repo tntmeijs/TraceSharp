@@ -107,10 +107,6 @@ namespace PathTracer
 
             // Dump the memory to disk
             renderer.SaveToDisk();
-
-            // Wait for the user to close the console window
-            Console.WriteLine("\n\nPress <Enter> to continue.");
-            Console.Read();
         }
     }
 }
