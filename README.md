@@ -37,7 +37,7 @@ Feel free to play around with it to see what effect it has on the final image.
 - Alan Wolfe's "*casual path tracing*" blog posts.
 
 ## Sample output
-![Basic path tracing](./Media/5_fixed_normals.png)
+![Basic path tracing](./Media/6_specular_roughness.png)
 
 Type | statistics
 ------------ | -------------
