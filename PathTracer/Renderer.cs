@@ -51,6 +51,17 @@ namespace PathTracer.Rendering
         private readonly List<PrimitiveBase> Scene;
 
         /// <summary>
+        /// Number of pixels rendered across all threads
+        /// Read / write operations on integers are atomic, no locks required
+        /// </summary>
+        private int PixelsRendered;
+
+        /// <summary>
+        /// Percentage that indicates how much of the final picture is done
+        /// </summary>
+        private int CurrentRenderPercentage;
+
+        /// <summary>
         /// Construct a new renderer
         /// </summary>
         public Renderer()
@@ -77,6 +88,9 @@ namespace PathTracer.Rendering
             LinesLeftToRender       = new ConcurrentBag<int>();
 
             Scene                   = new List<PrimitiveBase>();
+
+            PixelsRendered          = 0;
+            CurrentRenderPercentage = 0;
         }
 
         /// <summary>
@@ -93,6 +107,15 @@ namespace PathTracer.Rendering
         /// </summary>
         public void Start()
         {
+            // Print render settings
+            Console.WriteLine("=== RENDER SETTINGS ===");
+            Console.WriteLine("Maximum number of bounces per ray\t: " + MaxBounces);
+            Console.WriteLine("Maximum number of samples per pixel\t: " + SamplesPerPixel);
+            Console.WriteLine("Field of view\t\t\t\t: " + FieldOfView);
+            Console.WriteLine("Exposure\t\t\t\t: " + Exposure);
+            Console.WriteLine("Output image\t\t\t\t: " + OutputWidth + "x" + OutputHeight + " pixels");
+            Console.WriteLine("\n\n");
+
             // Generate a list of line indices to render
             for (int i = 0; i < OutputHeight; ++i)
             {
@@ -135,6 +158,11 @@ namespace PathTracer.Rendering
             // One random number generator instance per thread as it is not thread safe
             Random randomNumberGenerator = new Random(Guid.NewGuid().GetHashCode());
 
+            // Temporary storage buffer to store rendered lines into
+            // This prevents the thread from having to wait for other threads to finish
+            // writing to the output image
+            List<KeyValuePair<int, Color[]>> renderedLineCache = new List<KeyValuePair<int, Color[]>>();
+
             while (true)
             {
                 // Collection is empty, no more lines left to render
@@ -143,21 +171,38 @@ namespace PathTracer.Rendering
                     break;
                 }
 
-                // Render this line
-                Color[] pixelData = ProcessLine(lineIndex, randomNumberGenerator);
-                
-                // Save the line data
-                for (int i = 0; i < pixelData.Length; ++i)
+                // Render this line and save it in the thread-local output buffer
+                renderedLineCache.Add(new KeyValuePair<int, Color[]>(lineIndex, ProcessLine(lineIndex, randomNumberGenerator)));
+
+                // Update progress status message
+                int percentage = (int)System.Math.Ceiling((double)PixelsRendered / (OutputWidth * OutputHeight) * 100.0d);
+                if (percentage > CurrentRenderPercentage)
                 {
-                    // Post processing steps
-                    Color finalColor = ApplyPostProcessing(pixelData[i]);
+                    // Console read / write operations are thread-safe
+                    Console.WriteLine("[PROGRESS] " + percentage + "%");
+                    CurrentRenderPercentage = percentage;
+                }
+            }
 
-                    // Index in the final image
-                    int absolutePixelIndex = (lineIndex * OutputWidth) + i;
+            Console.WriteLine("Flushing " + renderedLineCache.Count + " cached rendered lines.");
 
-                    // Store the result
-                    lock (OutputImageLock)
+            // Thread is done, write all cached rendered lines to the output buffer
+            // Instead of locking the output buffer for each pixel, this threads takes complete
+            // ownership of the output buffer until all pixels in the cache have been written into it
+            lock (OutputImageLock)
+            {
+                foreach (KeyValuePair<int, Color[]> pair in renderedLineCache)
+                {
+                    for (int i = 0; i < pair.Value.Length; ++i)
                     {
+                        // Post processing steps
+                        Color finalColor = ApplyPostProcessing(pair.Value[i]);
+
+                        // Index in the final image
+                        int absolutePixelIndex = (pair.Key * OutputWidth) + i;
+
+                        // Store the result
+
                         OutputImage.SetPixel(absolutePixelIndex, finalColor);
                     }
                 }
@@ -240,6 +285,8 @@ namespace PathTracer.Rendering
                     outputColor = Color.Mix(previousFrameColor, color, 1.0d / (i + 1));
                     previousFrameColor = outputColor;
                 }
+
+                ++PixelsRendered;
 
                 output[uInt] = outputColor;
             }
