@@ -69,29 +69,40 @@ namespace PathTracer.Primitives
                 Emissive = Material.Emissive * Material.EmissiveStrength
             };
 
+            // Since this function flips the vertex order if needed, it is not thread-safe
+            // To prevent any weird issues from happening without locking access when executing this function,
+            // it makes sense to copy all the class members to temporary values first.
+            // This function will then modify the temporary values instead of the actual member values shared across
+            // all threads.
+            Vector3 tempBottomLeft  = BottomLeft;
+            Vector3 tempBottomRight = BottomRight;
+            Vector3 tempTopRight    = TopRight;
+            Vector3 tempTopLeft     = TopLeft;
+
             // Calculate the normal vector
-            Vector3 normal = Vector3.Cross(TopRight - BottomLeft, TopRight - BottomRight).Normalized;
+            Vector3 normal = Vector3.Cross(tempTopRight - tempBottomLeft, tempTopRight - tempBottomRight).Normalized;
 
             // Flip vertex order if needed
             if (Vector3.Dot(normal, ray.Direction) > 0.0d)
             {
                 normal = -normal;
 
-                Vector3 temp = TopLeft;
-                TopLeft = BottomLeft;
-                BottomLeft = temp;
+                Vector3 temp = tempTopLeft;
+                
+                tempTopLeft = tempBottomLeft;
+                tempBottomLeft = temp;
 
-                temp = BottomRight;
-                BottomRight = TopRight;
-                TopRight = temp;
+                temp = tempBottomRight;
+                tempBottomRight = tempTopRight;
+                tempTopRight = temp;
             }
 
             Vector3 p = ray.Origin;
             Vector3 q = ray.Origin + ray.Direction;
             Vector3 pq = q - p;
-            Vector3 pa = BottomLeft - p;
-            Vector3 pb = BottomRight - p;
-            Vector3 pc = TopRight - p;
+            Vector3 pa = tempBottomLeft - p;
+            Vector3 pb = tempBottomRight - p;
+            Vector3 pc = tempTopRight - p;
 
             // Determine which triangle to test against by testing against the diagonal first
             Vector3 m = Vector3.Cross(pc, pq);
@@ -120,11 +131,11 @@ namespace PathTracer.Primitives
                 v *= denominator;
                 w *= denominator;
 
-                intersectPosition = (BottomLeft * u) + (BottomRight * v) + (TopRight * w);
+                intersectPosition = (tempBottomLeft * u) + (tempBottomRight * v) + (tempTopRight * w);
             }
             else
             {
-                Vector3 pd = TopLeft - p;
+                Vector3 pd = tempTopLeft - p;
 
                 double u = Vector3.Dot(pd, m);
 
@@ -147,7 +158,7 @@ namespace PathTracer.Primitives
                 v *= denominator;
                 w *= denominator;
 
-                intersectPosition = (BottomLeft * u) + (TopLeft * v) + (TopRight * w);
+                intersectPosition = (tempBottomLeft * u) + (tempTopLeft * v) + (tempTopRight * w);
             }
 
             double distance;

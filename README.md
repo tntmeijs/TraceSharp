@@ -11,7 +11,7 @@ There are a lot of things I would've liked to implement but in the end this proj
 - Unit testing
 - Clean code
 - Object-oriented programming
-- Multi-threading (work in progress)
+- Multi-threading
 - File I/O
 
 ## Project structure
