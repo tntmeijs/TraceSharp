@@ -42,5 +42,7 @@ Feel free to play around with it to see what effect it has on the final image.
 Type | statistics
 ------------ | -------------
 Resolution | 1280 x 720 pixels
-Samples per pixel | 2048
-Bounces | 8
+Samples per pixel | 1024
+Bounces | 4
+Time | 1 hour, 4 minutes, 57 seconds
+Threads | 16
