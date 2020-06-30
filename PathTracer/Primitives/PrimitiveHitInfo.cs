@@ -22,14 +22,9 @@ namespace PathTracer.Primitives
         public Vector3 Normal;
 
         /// <summary>
-        /// Surface color
+        /// Material of the primitive
         /// </summary>
-        public Color Albedo;
-
-        /// <summary>
-        /// Surface emissiveness
-        /// </summary>
-        public Color Emissive;
+        public Material SurfaceMaterial;
 
         /// <summary>
         /// Create new intersection information that defaults to no intersection at all
@@ -39,8 +34,6 @@ namespace PathTracer.Primitives
             DidHit      = false;
             Distance    = 0.0d;
             Normal      = Vector3.Zero;
-            Albedo      = Color.Black;
-            Emissive    = Color.Black;
         }
     }
 }

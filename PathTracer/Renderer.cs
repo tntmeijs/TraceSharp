@@ -109,6 +109,8 @@ namespace PathTracer.Rendering
             for (int i = 0; i < threads.Length; ++i)
             {
                 threads[i] = new Thread(new ThreadStart(RenderTask));
+                threads[i].Name = "TraceSharp_Thread_" + i;
+                threads[i].Priority = ThreadPriority.Highest;
                 threads[i].Start();
             }
 
@@ -284,15 +286,29 @@ namespace PathTracer.Rendering
                     break;
                 }
 
-                // Construct a new ray
+                // Update the ray's position to be on the surface of the primitive
                 ray.Origin = (ray.Origin + ray.Direction * closestHitInfo.Distance) + closestHitInfo.Normal * EPSILON;
-                ray.Direction = closestHitInfo.Normal + Functions.RandomUnitVector(randomNumberGenerator);
+
+                // Calculate whether the next ray is going to be a diffuse or specular ray
+                bool useSpecular = (randomNumberGenerator.NextDouble() < closestHitInfo.SurfaceMaterial.Specularness);
+
+                // Diffuse rays use cosine weighted hemisphere samples
+                // Perfect smooth specular uses reflection rays
+                // Anything in between will be linearly interpolated by the roughness squared
+                // Roughness does not need to be squared, but it will help with the overall perception of roughness
+                Vector3 diffuseRayDirection = (closestHitInfo.Normal + Functions.RandomUnitVector(randomNumberGenerator)).Normalized;
+                Vector3 specularRayDirection = Vector3.Reflect(ray.Direction, closestHitInfo.Normal);
+                specularRayDirection = Vector3.Lerp(specularRayDirection, diffuseRayDirection, closestHitInfo.SurfaceMaterial.Roughness * closestHitInfo.SurfaceMaterial.Roughness);
+
+                // Update the ray's direction (automatically normalizes in the ray.Direction property)
+                ray.Direction = (useSpecular ? specularRayDirection : diffuseRayDirection);
 
                 // Add emissive lighting
-                color += closestHitInfo.Emissive * throughput;
+                Color emissive = closestHitInfo.SurfaceMaterial.Emissive * closestHitInfo.SurfaceMaterial.EmissiveStrength;
+                color += emissive * throughput;
 
                 // When a ray bounces off a surface, all future lighting for that ray is multiplied by the color of that surface
-                throughput *= closestHitInfo.Albedo;
+                throughput *= (useSpecular ? closestHitInfo.SurfaceMaterial.Specular : closestHitInfo.SurfaceMaterial.Albedo);
             }
 
             return color;

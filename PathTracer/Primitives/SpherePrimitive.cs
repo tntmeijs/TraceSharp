@@ -49,8 +49,7 @@ namespace PathTracer.Primitives
         {
             PrimitiveHitInfo hitInfo = new PrimitiveHitInfo()
             {
-                Albedo = Material.Albedo,
-                Emissive = Material.Emissive * Material.EmissiveStrength
+                SurfaceMaterial = Material
             };
 
             // Vector from center of the sphere to where the ray begins

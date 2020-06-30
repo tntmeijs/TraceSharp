@@ -169,6 +169,19 @@
         }
 
         /// <summary>
+        /// Reflect a ray using a (surface) normal
+        /// 
+        /// Reference: https://asawicki.info/news_1301_reflect_and_refract_functions.html
+        /// </summary>
+        /// <param name="input">Input direction</param>
+        /// <param name="normal">Normal to reflect around</param>
+        /// <returns>Reflected direction</returns>
+        public static Vector3 Reflect(Vector3 input, Vector3 normal)
+        {
+            return input - (normal * Dot(input, normal) * 2.0d);
+        }
+
+        /// <summary>
         /// Compare this vector against another vector
         /// </summary>
         /// <param name="obj">Vector to compare against</param>

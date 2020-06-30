@@ -65,8 +65,7 @@ namespace PathTracer.Primitives
         {
             PrimitiveHitInfo hitInfo = new PrimitiveHitInfo()
             {
-                Albedo = Material.Albedo,
-                Emissive = Material.Emissive * Material.EmissiveStrength
+                SurfaceMaterial = Material
             };
 
             // Since this function flips the vertex order if needed, it is not thread-safe

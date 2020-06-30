@@ -14,19 +14,19 @@ namespace PathTracer
             // Create all materials used in this scene
             #region MATERIALS
             // Walls
-            Material backWallMat = new Material(new Color(0.7d, 0.7d, 0.7d), new Color(0.0d, 0.0d, 0.0d));
-            Material floorMat = new Material(new Color(0.7d, 0.7d, 0.7d), new Color(0.0d, 0.0d, 0.0d));
-            Material ceilingMat = new Material(new Color(0.7d, 0.7d, 0.7d), new Color(0.0d, 0.0d, 0.0d));
-            Material leftWallMat = new Material(new Color(0.7d, 0.1d, 0.1d), new Color(0.0d, 0.0d, 0.0d));
-            Material rightWallMat = new Material(new Color(0.1d, 0.7d, 0.1d), new Color(0.0d, 0.0d, 0.0d));
+            Material backWallMat = new Material(new Color(0.7d, 0.7d, 0.7d), new Color(0.0d, 0.0d, 0.0d), Color.Black, 0.0d, 0.0d);
+            Material floorMat = new Material(new Color(0.7d, 0.7d, 0.7d), new Color(0.0d, 0.0d, 0.0d), Color.Black, 0.0d, 0.0d);
+            Material ceilingMat = new Material(new Color(0.7d, 0.7d, 0.7d), new Color(0.0d, 0.0d, 0.0d), Color.Black, 0.0d, 0.0d);
+            Material leftWallMat = new Material(new Color(0.7d, 0.1d, 0.1d), new Color(0.0d, 0.0d, 0.0d), Color.Black, 0.0d, 0.0d);
+            Material rightWallMat = new Material(new Color(0.1d, 0.7d, 0.1d), new Color(0.0d, 0.0d, 0.0d), Color.Black, 0.0d, 0.0d);
 
             // Light
-            Material lightSourceMat = new Material(new Color(0.0d, 0.0d, 0.0d), new Color(1.0d, 0.9d, 0.7d), 20.0d);
+            Material lightSourceMat = new Material(new Color(0.0d, 0.0d, 0.0d), new Color(1.0d, 0.9d, 0.7d), Color.Black, 0.0d, 0.0d, 20.0d);
 
             // Objects
-            Material yellowSphereMat = new Material(new Color(0.9d, 1.0d, 0.3d), new Color(0.0d, 0.0d, 0.0d));
-            Material pinkSphereMat = new Material(new Color(1.0d, 0.2d, 1.0d), new Color(0.0d, 0.0d, 0.0d));
-            Material tealSphereMat = new Material(new Color(0.0d, 0.8d, 0.8d), new Color(0.0d, 0.0d, 0.0d));
+            Material yellowSphereMat = new Material(new Color(0.9d, 1.0d, 0.3d), new Color(0.0d, 0.0d, 0.0d), new Color(0.9d, 0.9d, 0.9d), 0.2d, 0.1d);
+            Material pinkSphereMat = new Material(new Color(1.0d, 0.2d, 1.0d), new Color(0.0d, 0.0d, 0.0d), new Color(0.9d, 0.9d, 0.9d), 0.2d, 0.2d);
+            Material tealSphereMat = new Material(new Color(0.0d, 0.8d, 0.8d), new Color(0.0d, 0.0d, 0.0d), new Color(0.9d, 0.9d, 0.9d), 0.7d, 0.05d);
             #endregion
 
             // Construct a Cornell box

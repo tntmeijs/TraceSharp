@@ -212,5 +212,17 @@ namespace UnitTests.Math
             Assert.IsTrue(threeQuarter.Equals(new Vector3(1.5d, 3.0d, 6.0d)),   "Lerp three quarter failed.");
             Assert.IsTrue(full.Equals(new Vector3(2.0d, 4.0d, 8.0d)),           "Lerp full failed.");
         }
+
+        [TestMethod]
+        public void TestReflectVector3()
+        {
+            Vector3 input = new Vector3(-2.0d, -2.0d, 0.0d);
+            Vector3 normal = Vector3.Up;
+            Vector3 reflected = Vector3.Reflect(input, normal);
+
+            Assert.IsTrue(reflected.X == -2.0d, "Reflected X component incorrect.");
+            Assert.IsTrue(reflected.Y ==  2.0d, "Reflected Y component incorrect.");
+            Assert.IsTrue(reflected.Z ==  0.0d, "Reflected Z component incorrect.");
+        }
     }
 }

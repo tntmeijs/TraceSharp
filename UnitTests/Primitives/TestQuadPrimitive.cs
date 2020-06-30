@@ -12,7 +12,7 @@ namespace UnitTests.Primitives
         [TestMethod]
         public void TestEmptyConstructorQuadPrimitive()
         {
-            QuadPrimitive quad = new QuadPrimitive(new Material(Color.Black, Color.Black));
+            QuadPrimitive quad = new QuadPrimitive(new Material(Color.Black, Color.Black, Color.White));
 
             Assert.IsTrue(quad.BottomLeft.Equals(new Vector3(-0.5d, -0.5d, 0.0d)),  "Quad bottom left corner incorrect.");
             Assert.IsTrue(quad.BottomRight.Equals(new Vector3(0.5d, -0.5d, 0.0d)),  "Quad bottom right corner incorrect.");
@@ -28,7 +28,7 @@ namespace UnitTests.Primitives
                 new Vector3(15.0d, -15.0d, 22.0d),
                 new Vector3(15.0d, 15.0d, 22.0d),
                 new Vector3(-15.0d, 15.0d, 22.0d),
-                new Material(Color.Black, Color.Black));
+                new Material(Color.Black, Color.Black, Color.White));
 
             Assert.IsTrue(quad.BottomLeft.Equals(new Vector3(-15.0d, -15.0d, 22.0d)),   "Quad bottom left corner incorrect.");
             Assert.IsTrue(quad.BottomRight.Equals(new Vector3(15.0d, -15.0d, 22.0d)),   "Quad bottom right corner incorrect.");
@@ -39,12 +39,11 @@ namespace UnitTests.Primitives
         [TestMethod]
         public void TestRayIntersectInsideQuadPrimitive()
         {
-            QuadPrimitive quad = new QuadPrimitive(new Material(Color.Black, Color.Black));
-            PrimitiveHitInfo hitInfo = new PrimitiveHitInfo();
+            QuadPrimitive quad = new QuadPrimitive(new Material(Color.Black, Color.Black, Color.White));
             Ray ray = new Ray();
 
             // Test if the ray hits the quad when the ray starts inside the quad
-            bool hit = quad.TestRayIntersection(ray, 0.1d, 10000.0d, ref hitInfo);
+            bool hit = quad.TestRayIntersection(ray, 0.1d, 10000.0d).DidHit;
 
             Assert.IsFalse(hit, "Ray starts inside the quad, this should not be a hit.");
         }
@@ -52,12 +51,11 @@ namespace UnitTests.Primitives
         [TestMethod]
         public void TestRayIntersectBehindQuadPrimitive()
         {
-            QuadPrimitive quad = new QuadPrimitive(new Material(Color.Black, Color.Black));
-            PrimitiveHitInfo hitInfo = new PrimitiveHitInfo();
+            QuadPrimitive quad = new QuadPrimitive(new Material(Color.Black, Color.Black, Color.White));
             Ray ray = new Ray(new Vector3(0.0d, 0.0d, 5.0d), Vector3.Forward);
 
             // Test if the ray hits the quad when the ray stars in behind of the quad
-            bool hit = quad.TestRayIntersection(ray, 0.1d, 10000.0d, ref hitInfo);
+            bool hit = quad.TestRayIntersection(ray, 0.1d, 10000.0d).DidHit;
 
             Assert.IsFalse(hit, "Ray starts in behind of the quad, this should never be a hit.");
         }
@@ -68,16 +66,15 @@ namespace UnitTests.Primitives
             const double NEAR   = 0.1d;
             const double FAR    = 10000.0d;
 
-            QuadPrimitive quad = new QuadPrimitive(new Material(Color.Black, Color.Black));
-            PrimitiveHitInfo hitInfo = new PrimitiveHitInfo();
+            QuadPrimitive quad = new QuadPrimitive(new Material(Color.Black, Color.Black, Color.White));
 
             // Far ref of bounds (miss)
             Ray ray = new Ray(new Vector3(0.0d, 0.0d, -15000.0d), Vector3.Forward);
-            bool farHit = quad.TestRayIntersection(ray, NEAR, FAR, ref hitInfo);
+            bool farHit = quad.TestRayIntersection(ray, NEAR, FAR).DidHit;
 
             // Near ref of bounds (too close)
             ray = new Ray(new Vector3(0.0d, 0.0d, -0.05d), Vector3.Forward);
-            bool nearHit = quad.TestRayIntersection(ray, NEAR, FAR, ref hitInfo);
+            bool nearHit = quad.TestRayIntersection(ray, NEAR, FAR).DidHit;
 
             Assert.IsFalse(farHit,  "Ray length too long, this should miss the quad.");
             Assert.IsFalse(nearHit, "Ray length too short, this should miss the quad.");
