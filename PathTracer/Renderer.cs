@@ -76,7 +76,7 @@ namespace PathTracer.Rendering
 
             LinesLeftToRender       = new ConcurrentBag<int>();
 
-            Scene = new List<PrimitiveBase>();
+            Scene                   = new List<PrimitiveBase>();
         }
 
         /// <summary>
@@ -143,7 +143,7 @@ namespace PathTracer.Rendering
 
                 // Render this line
                 Color[] pixelData = ProcessLine(lineIndex, randomNumberGenerator);
-
+                
                 // Save the line data
                 for (int i = 0; i < pixelData.Length; ++i)
                 {
