@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+
 using PathTracer.Math;
 using PathTracer.Primitives;
 using PathTracer.Rendering;
@@ -102,11 +104,23 @@ namespace PathTracer
             renderer.AddPrimitiveToScene(rightSphere);
             #endregion
 
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
             // Render the scene into memory
             renderer.Start();
 
             // Dump the memory to disk
             renderer.SaveToDisk();
+
+            stopwatch.Stop();
+            Console.WriteLine("Total render time:");
+            Console.WriteLine("    Hours\t\t: " + stopwatch.Elapsed.Hours);
+            Console.WriteLine("    Minutes\t\t: " + stopwatch.Elapsed.Minutes);
+            Console.WriteLine("    Seconds\t\t: " + stopwatch.Elapsed.Seconds);
+            Console.WriteLine("    Milliseconds\t: " + stopwatch.Elapsed.Milliseconds);
+            Console.WriteLine("\nPress <ENTER> to continue...");
+            Console.Read();
         }
     }
 }
